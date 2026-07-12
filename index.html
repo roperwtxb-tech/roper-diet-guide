@@ -1301,5 +1301,12 @@ document.getElementById('fsrch').addEventListener('input',renderFoods);
   document.body.innerHTML = '<div style="padding:20px;font-family:sans-serif"><h2 style="color:red">Error found:</h2><p style="margin-top:10px;font-size:14px;background:#fee;padding:12px;border-radius:8px">' + err.message + '<br><br>Line: ' + (err.lineNumber || err.line || 'unknown') + '</p></div>';
 }
 </script>
+<script>
+if('serviceWorker' in navigator){
+ window.addEventListener('load', function(){
+  navigator.serviceWorker.register('./sw.js').catch(function(e){});
+ });
+}
+</script>
 </body>
 </html>
