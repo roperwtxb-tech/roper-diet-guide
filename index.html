@@ -224,6 +224,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
  </div>
  <input type="file" id="photoInput" accept="image/*" capture="environment"/>
  <img id="pphoto" class="prev-img" style="display:none"/>
+ <button id="clearPhotoBtn" class="lab" style="display:none;width:100%;margin-bottom:11px" onclick="clearPhoto()">&#10005; Remove photo</button>
  <div class="or-div">or type a product name</div>
  <div class="sw" style="margin-bottom:10px">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -743,10 +744,13 @@ document.getElementById('photoInput').addEventListener('change',function(e){
   photoB64=ev.target.result.split(',')[1];
   document.getElementById('pinput').value='';
   document.getElementById('scanResult').innerHTML='';
+  document.getElementById('clearPhotoBtn').style.display='block';
  };
  reader.readAsDataURL(file);
 });
 document.getElementById('pinput').addEventListener('keydown',function(e){if(e.key==='Enter')doScan();});
+document.getElementById('pinput').addEventListener('input',function(){if(photoB64)clearPhoto();});
+function clearPhoto(){photoB64=null;var pv=document.getElementById('pphoto');pv.src='';pv.style.display='none';document.getElementById('clearPhotoBtn').style.display='none';document.getElementById('photoInput').value='';document.getElementById('scanResult').innerHTML='';toast('Photo cleared');}
 
 var SYSPROMPT='You are a dietary expert helping parents of a 4-year-old girl on a strict combined diet: 1. GLUTEN-FREE: no wheat, barley, rye, regular oats 2. EXTREMELY LOW SUGAR: no added sugars, minimal natural sugars, no syrups, no juice 3. LOW HISTAMINE: avoid aged/fermented/canned foods, tomatoes, citrus, strawberries, avocado, vinegar, alcohol, long-cooked broth 4. GAPS DIET: no grains (including rice, corn, oats), no starchy vegetables (potatoes), no legumes, no processed foods. Allowed: fresh meats, eggs, non-starchy vegetables, nuts/seeds, raw honey in tiny amounts. Respond ONLY in this exact JSON (no markdown): {"verdict":"allowed|caution|avoid","productName":"string","summary":"one sentence","dietBreakdown":{"glutenFree":{"status":"ok|caution|no","reason":"brief"},"lowSugar":{"status":"ok|caution|no","reason":"brief"},"lowHistamine":{"status":"ok|caution|no","reason":"brief"},"gaps":{"status":"ok|caution|no","reason":"brief"}},"keyIssues":["array"],"saferAlternative":"string or null"}';
 
