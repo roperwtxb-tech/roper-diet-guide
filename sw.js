@@ -1,5 +1,5 @@
-var CACHE_NAME = 'rdg-cache-v1';
-var CORE_ASSETS = ['./', './index.html'];
+var CACHE_NAME = 'rdg-cache-v2';
+var CORE_ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function(event){
  self.skipWaiting();
