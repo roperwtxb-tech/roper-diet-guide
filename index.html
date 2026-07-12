@@ -209,6 +209,14 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
 
 <div class="pg" id="pg-scanner">
  <div class="infobox"><strong>AI ingredient checker.</strong> Photo a product label or type a name to check it against all four diet rules.</div>
+ <div class="infobox" id="keyBox" style="background:var(--bg2);border-color:var(--bdr);color:var(--t2)">
+  <strong>Anthropic API key</strong> &mdash; needed once per device for scanning. Stored only in this browser, never sent anywhere except Anthropic's API.
+  <div class="lc" style="margin-top:8px;margin-bottom:0">
+   <input class="liinp" id="apiKeyInput" type="password" placeholder="sk-ant-..."/>
+   <button class="addbtn" onclick="saveApiKey()">Save</button>
+  </div>
+  <div id="keyStatus" style="margin-top:6px;font-size:12px"></div>
+ </div>
  <div class="scan-area" onclick="document.getElementById('photoInput').click()">
   <div style="font-size:36px;margin-bottom:8px">&#128247;</div>
   <div style="font-size:15px;font-weight:600;margin-bottom:3px">Take or upload a photo</div>
@@ -274,6 +282,7 @@ var shopList = [];
 var reactions = [];
 var listCatFilter = 'All';
 var photoB64 = null, rxSev = 'mild';
+var apiKey = '';
 var resBuilt = false;
 
 // ── FOODS DATA ──────────────────────────────────────────
@@ -720,6 +729,10 @@ function renderRes(){
  el.innerHTML=html;
 }
 
+function loadApiKey(){try{var k=localStorage.getItem('rdg_key');if(k)apiKey=k;}catch(e){}}
+function saveApiKey(){var v=document.getElementById('apiKeyInput').value.trim();if(!v){toast('Enter a key first');return;}apiKey=v;try{localStorage.setItem('rdg_key',v);}catch(e){}document.getElementById('apiKeyInput').value='';updateKeyStatus();toast('API key saved on this device');}
+function updateKeyStatus(){var el=document.getElementById('keyStatus');if(!el)return;if(apiKey){el.innerHTML='<span style="color:var(--gd)">&#10003; Key saved (ends '+apiKey.slice(-4)+')</span>';}else{el.innerHTML='<span style="color:var(--rd)">No key saved yet &mdash; scanning will not work until you add one.</span>';}}
+
 // ── SCANNER ──────────────────────────────────────────────
 document.getElementById('photoInput').addEventListener('change',function(e){
  var file=e.target.files[0];if(!file)return;
@@ -737,19 +750,21 @@ document.getElementById('pinput').addEventListener('keydown',function(e){if(e.ke
 
 var SYSPROMPT='You are a dietary expert helping parents of a 4-year-old girl on a strict combined diet: 1. GLUTEN-FREE: no wheat, barley, rye, regular oats 2. EXTREMELY LOW SUGAR: no added sugars, minimal natural sugars, no syrups, no juice 3. LOW HISTAMINE: avoid aged/fermented/canned foods, tomatoes, citrus, strawberries, avocado, vinegar, alcohol, long-cooked broth 4. GAPS DIET: no grains (including rice, corn, oats), no starchy vegetables (potatoes), no legumes, no processed foods. Allowed: fresh meats, eggs, non-starchy vegetables, nuts/seeds, raw honey in tiny amounts. Respond ONLY in this exact JSON (no markdown): {"verdict":"allowed|caution|avoid","productName":"string","summary":"one sentence","dietBreakdown":{"glutenFree":{"status":"ok|caution|no","reason":"brief"},"lowSugar":{"status":"ok|caution|no","reason":"brief"},"lowHistamine":{"status":"ok|caution|no","reason":"brief"},"gaps":{"status":"ok|caution|no","reason":"brief"}},"keyIssues":["array"],"saferAlternative":"string or null"}';
 
-async function doScan(){
+window.doScan = doScan; async function doScan(){
  var btn=document.getElementById('scanbtn');
  var resEl=document.getElementById('scanResult');
  var txt=document.getElementById('pinput').value.trim();
  if(!photoB64&&!txt){resEl.innerHTML='<div class="rbox rca"><div class="rtitle">Nothing to analyze</div><div class="rbody">Please take a photo or type a product name.</div></div>';return;}
+ if(!apiKey){resEl.innerHTML='<div class="rbox rca"><div class="rtitle">No API key set</div><div class="rbody">Add your Anthropic API key in the box near the top of this tab, then try again.</div></div>';return;}
  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyzing...';
  resEl.innerHTML='<div style="text-align:center;padding:20px;font-size:14px;color:var(--t2)">Checking against all four diet rules...</div>';
  try{
   var messages;
   if(photoB64)messages=[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:photoB64}},{type:"text",text:"Analyze this product label for the diet described."}]}];
   else messages=[{role:"user",content:'Analyze this product: "'+txt+'"'}];
-  var resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:SYSPROMPT,messages:messages})});
+  var resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1000,system:SYSPROMPT,messages:messages})});
   var data=await resp.json();
+  if(!resp.ok){throw new Error((data&&data.error&&data.error.message)||('Request failed: HTTP '+resp.status));}
   var rawText=data.content&&data.content.find(function(b){return b.type==='text';});
   rawText=rawText?rawText.text:'';
   var result=JSON.parse(rawText.replace(/```json|```/g,'').trim());
@@ -769,6 +784,8 @@ async function doScan(){
 
 // ── INIT ────────────────────────────────────────────────
 load();
+loadApiKey();
+updateKeyStatus();
 buildCatPills();
 buildListCats();
 renderFoods();
