@@ -172,6 +172,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
    <button class="tab" onclick="goTab('rx',this)">Reactions <span class="cbdg" id="rxc" style="display:none">0</span></button>
    <button class="tab" onclick="goTab('res',this)">Resources</button>
    <button class="tab" onclick="goTab('dining',this)">Dining Out</button>
+   <button class="tab" onclick="goTab('reintro',this);initReintroTab()">Reintro</button>
   </div>
  </div>
 </nav>
@@ -449,6 +450,22 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
  </div>
 </div>
 
+<div class="pg" id="pg-reintro">
+ <div class="infobox" style="margin-bottom:14px"><strong>Reintroduction tracker.</strong> Log each new food one at a time and wait before trying the next, so any reaction can be clearly linked to a single food. General elimination-diet guidance suggests waiting about 3&ndash;4 days between new foods (GAPS suggests every 2&ndash;3 days once gut healing is well underway). Because of her seizure history, always follow your daughter's medical team's specific guidance on timing and which food to try next.</div>
+ <div id="reintroSummary"></div>
+ <div class="rxform">
+  <h3>Log a new food to try</h3>
+  <div class="frow"><label class="flbl">Food or ingredient *</label><input class="finp" id="ri-food" type="text" placeholder="e.g. Sweet potato"/></div>
+  <div class="frow2">
+   <div><label class="flbl">Date introduced</label><input class="finp" id="ri-date" type="date"/></div>
+   <div><label class="flbl">Wait before next food</label><select class="finp" id="ri-wait"><option value="3">3 days</option><option value="4" selected>4 days</option><option value="5">5 days</option><option value="7">7 days</option></select></div>
+  </div>
+  <div class="frow"><label class="flbl">Starting amount / dose</label><input class="finp" id="ri-dose" type="text" placeholder="e.g. 1 teaspoon at breakfast"/></div>
+  <div class="frow"><label class="flbl">Notes (optional)</label><textarea class="finp" id="ri-notes" placeholder="How it was prepared, anything else to remember..." style="min-height:55px"></textarea></div>
+  <button class="btn" style="margin-top:4px" onclick="addReintro()">Save to reintroduction log</button>
+ </div>
+ <div id="reintroLog"></div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 try {
@@ -732,6 +749,106 @@ function filterMealsByIngredient(q){
   });
  }
  wrap.innerHTML=html;
+}
+
+var reintros = null;
+function initReintroTab(){
+ if(reintros===null){
+  try{ reintros = JSON.parse(localStorage.getItem('rdg_reintro')||'[]'); }catch(e){ reintros=[]; }
+ }
+ var d=document.getElementById('ri-date');
+ if(d && !d.value){
+  var t=new Date();
+  var mm=String(t.getMonth()+1); if(mm.length<2) mm='0'+mm;
+  var dd=String(t.getDate()); if(dd.length<2) dd='0'+dd;
+  d.value=t.getFullYear()+'-'+mm+'-'+dd;
+ }
+ renderReintros();
+}
+function saveReintros(){ localStorage.setItem('rdg_reintro', JSON.stringify(reintros)); }
+function addReintro(){
+ var foodEl=document.getElementById('ri-food');
+ var dateEl=document.getElementById('ri-date');
+ var food=(foodEl.value||'').trim();
+ var date=dateEl.value;
+ var wait=parseInt(document.getElementById('ri-wait').value,10)||4;
+ var dose=(document.getElementById('ri-dose').value||'').trim();
+ var notes=(document.getElementById('ri-notes').value||'').trim();
+ if(!food || !date){ alert('Please enter a food name and date.'); return; }
+ if(reintros===null) reintros=[];
+ reintros.unshift({id:Date.now(), food:food, date:date, wait:wait, dose:dose, notes:notes, status:'watching'});
+ saveReintros();
+ foodEl.value='';
+ document.getElementById('ri-dose').value='';
+ document.getElementById('ri-notes').value='';
+ renderReintros();
+}
+function markReintro(id, status){
+ for(var i=0;i<reintros.length;i++){ if(reintros[i].id===id){ reintros[i].status=status; break; } }
+ saveReintros();
+ renderReintros();
+}
+function delReintro(id){
+ reintros = reintros.filter(function(r){return r.id!==id;});
+ saveReintros();
+ renderReintros();
+}
+function riDaysBetween(dateStr){
+ var start=new Date(dateStr+'T00:00:00');
+ var now=new Date();
+ var nowMid=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+ return Math.round((nowMid-start)/86400000);
+}
+function riFmtDate(d){
+ return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+}
+function renderReintros(){
+ var sumEl=document.getElementById('reintroSummary');
+ var logEl=document.getElementById('reintroLog');
+ if(!sumEl||!logEl) return;
+ if(!reintros || reintros.length===0){
+  sumEl.innerHTML='<div class="infobox" style="background:var(--bg2);border-color:var(--bdr);color:var(--t2)">No foods logged yet. Add the first one below to start tracking.</div>';
+  logEl.innerHTML='<div class="empty">Nothing logged yet.</div>';
+  return;
+ }
+ var latest=reintros[0];
+ var elapsed=riDaysBetween(latest.date);
+ var sumHtml='';
+ if(latest.status==='watching'){
+  if(elapsed>=latest.wait){
+   sumHtml='<div class="infobox"><strong>Ready for the next food.</strong> '+latest.food+' has been watched for '+elapsed+' day'+(elapsed===1?'':'s')+' with no reaction logged.</div>';
+  } else {
+   var nd=new Date(latest.date+'T00:00:00'); nd.setDate(nd.getDate()+latest.wait);
+   sumHtml='<div class="infobox" style="background:var(--al);border-color:var(--a);color:var(--ad)"><strong>Watching '+latest.food+'</strong> &mdash; day '+elapsed+' of '+latest.wait+'. Safe to try the next new food on '+riFmtDate(nd)+' if no reaction.</div>';
+  }
+ } else if(latest.status==='reaction'){
+  sumHtml='<div class="infobox" style="background:var(--rl);border-color:var(--r);color:var(--rd)"><strong>Reaction logged for '+latest.food+'.</strong> Pause new introductions and check with your daughter’s medical team before trying another food.</div>';
+ } else {
+  sumHtml='<div class="infobox"><strong>'+latest.food+' was tolerated.</strong> Ready to log and try the next new food whenever you are.</div>';
+ }
+ sumEl.innerHTML=sumHtml;
+ var html='';
+ reintros.forEach(function(r){
+  var badge = r.status==='tolerated' ? '<span class="bdg bok">Tolerated</span>' : r.status==='reaction' ? '<span class="bdg bno">Reaction</span>' : '<span class="bdg bca">Watching</span>';
+  var el=riDaysBetween(r.date);
+  html+='<div class="rxcard">'+
+   '<div class="rxch" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">'+
+    '<div class="rxci"><div class="rxcn">'+r.food+'</div><div class="rxcd">'+riFmtDate(new Date(r.date+'T00:00:00'))+' &middot; day '+el+' of '+r.wait+'</div></div>'+
+    badge+
+   '</div>'+
+   '<div class="rxcb">'+
+    (r.dose? '<div class="dl">Amount</div><div class="dtt">'+r.dose+'</div>' : '')+
+    (r.notes? '<div class="dl">Notes</div><div class="dtt">'+r.notes+'</div>' : '')+
+    '<div class="la" style="margin-top:10px">'+
+     (r.status==='watching' ?
+      '<button class="lab" onclick="event.stopPropagation();markReintro('+r.id+',&#39;tolerated&#39;)">&#10003; Mark tolerated</button><button class="lab dng" onclick="event.stopPropagation();markReintro('+r.id+',&#39;reaction&#39;)">Mark reaction</button>'
+      : '<button class="lab" onclick="event.stopPropagation();markReintro('+r.id+',&#39;watching&#39;)">Reopen</button>')+
+     '<button class="lab dng" onclick="event.stopPropagation();delReintro('+r.id+')">Delete</button>'+
+    '</div>'+
+   '</div>'+
+  '</div>';
+ });
+ logEl.innerHTML=html;
 }
 
 // ── RESOURCES DATA ──────────────────────────────────────
