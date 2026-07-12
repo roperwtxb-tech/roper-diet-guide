@@ -272,6 +272,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
   <div class="frow"><label class="flbl">Additional notes (optional)</label><textarea class="finp" id="rx-notes" placeholder="Brand, symptoms, how long they lasted..." style="min-height:55px"></textarea></div>
   <button class="btn" style="margin-top:4px" onclick="addRx()">Save to reactions log</button>
  </div>
+ <button class="lab" style="width:100%;margin-bottom:11px" onclick="exportReactionsPrint()">&#128424; Print / export log</button>
  <div id="rxLog"></div>
 </div>
 
@@ -849,6 +850,41 @@ function renderReintros(){
   '</div>';
  });
  logEl.innerHTML=html;
+}
+
+function exportReactionsPrint(){
+ if(!reactions || reactions.length===0){ alert('No reactions logged yet.'); return; }
+ var rows = reactions.slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+ var sevLabel={mild:'Mild',mod:'Moderate',sev:'Severe'};
+ var html = '<h1 style="font-family:sans-serif;margin-bottom:4px">Roper Diet Guide &mdash; Reaction &amp; Avoidance Log</h1>';
+ html += '<p style="font-family:sans-serif;color:#555;margin-top:0">Exported '+new Date().toLocaleDateString()+' &middot; '+rows.length+' entr'+(rows.length===1?'y':'ies')+'</p>';
+ html += '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:13px">';
+ html += '<thead><tr style="background:#eee;text-align:left"><th style="padding:6px;border:1px solid #ccc">Date</th><th style="padding:6px;border:1px solid #ccc">Food / Product</th><th style="padding:6px;border:1px solid #ccc">Category</th><th style="padding:6px;border:1px solid #ccc">Severity</th><th style="padding:6px;border:1px solid #ccc">Reaction / Reason</th><th style="padding:6px;border:1px solid #ccc">Notes</th></tr></thead><tbody>';
+ rows.forEach(function(r){
+  html += '<tr>'+
+   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top;white-space:nowrap">'+(r.date||'')+'</td>'+
+   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.name||'')+'</td>'+
+   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.cat||'')+'</td>'+
+   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(sevLabel[r.sev]||r.sev||'')+'</td>'+
+   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.reason||'')+'</td>'+
+   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.notes||'')+'</td>'+
+  '</tr>';
+ });
+ html += '</tbody></table>';
+
+ var area = document.getElementById('rxPrintArea');
+ if(!area){
+  area = document.createElement('div');
+  area.id = 'rxPrintArea';
+  area.style.display = 'none';
+  document.body.appendChild(area);
+  var style = document.createElement('style');
+  style.id = 'rxPrintStyle';
+  style.innerHTML = '@media print { body > *:not(#rxPrintArea){display:none !important;} #rxPrintArea{display:block !important; position:absolute; top:0; left:0; width:100%; color:#000; background:#fff;} }';
+  document.head.appendChild(style);
+ }
+ area.innerHTML = html;
+ window.print();
 }
 
 // ── RESOURCES DATA ──────────────────────────────────────
