@@ -500,11 +500,11 @@ function renderFoods(){
     var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';
     tags+='<span class="dt '+tc+'">'+k.toUpperCase()+':'+vi+'</span>';
    });
-   var sbg=f.sh?'<button class="sbx sbg" onclick="event.stopPropagation();addFoodToList(''+f.n.replace(/'/g,"\'")+'',''+f.sh+'')">+List</button>':'';
-   var sbl='<button class="sbx sbr" onclick="event.stopPropagation();prefillRx(''+f.n.replace(/'/g,"\'")+'')">Log</button>';
-   html+='<div class="fc'+(openFood===f.n?' open':'')+'" onclick="toggleFood(''+f.n.replace(/'/g,"\'")+'')">'+
+   var sbg=f.sh?'<button class="sbx sbg" onclick="event.stopPropagation();addFoodToList(\''+f.n.replace(/'/g,"\\'")+'\',\''+f.sh+'\')">+List</button>':'';
+   var sbl='<button class="sbx sbr" onclick="event.stopPropagation();prefillRx(\''+f.n.replace(/'/g,"\\'")+'\')">Log</button>';
+   html+='<div class="fc'+(openFood===f.n?' open':'')+'" onclick="toggleFood(\''+f.n.replace(/'/g,"\\'")+'\')">'+
     '<div class="fch"><div class="fci"><div class="fcn">'+f.n+'</div><div class="fcc">'+f.c+'</div></div>'+
-    '<div class="fca">'+sbg+sbl+'<button class="hb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favFood(''+f.n.replace(/'/g,"\'")+'',this)">&#9829;</button>'+
+    '<div class="fca">'+sbg+sbl+'<button class="hb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favFood(\''+f.n.replace(/'/g,"\\'")+'\',this)">&#9829;</button>'+
     '<span class="bdg '+bc+'">'+ic+'</span></div></div>'+
     '<div class="dtags">'+tags+'</div>'+
     '<div class="fcb">'+(f.p?'<div class="dl">How to prepare</div><div class="dtt dtp">'+f.p+'</div>':'')+
@@ -552,7 +552,7 @@ function renderMeals(){
   html+='<div class="mc'+(openMeal===idx?' open':'')+'">'+
    '<div class="mch" onclick="toggleMeal('+idx+')">'+
    '<div><div class="mct">'+m.n+'</div><div class="mcm">'+m.t+'</div></div>'+
-   '<div class="mcr"><button class="mfb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favMeal(''+m.n.replace(/'/g,"\'")+'',this)">&#9829;</button>'+chev+'</div></div>'+
+   '<div class="mcr"><button class="mfb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favMeal(\''+m.n.replace(/'/g,"\\'")+'\',this)">&#9829;</button>'+chev+'</div></div>'+
    '<div class="mcb"><p style="font-size:13px;color:var(--t2);margin-bottom:10px;line-height:1.5">'+m.d+'</p>'+
    '<div class="ms"><h4>Ingredients</h4><ul>'+ingr+'</ul></div>'+
    '<div class="ms"><h4>Steps</h4><ol>'+steps+'</ol></div>'+
@@ -598,7 +598,7 @@ function renderFavs(){
    var tags='';
    ['gf','ls','lh','g'].forEach(function(k){var v=f.d[k];var tc=v==='ok'?'dtok':v==='no'?'dtno':'dtca';var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';tags+='<span class="dt '+tc+'">'+k.toUpperCase()+':'+vi+'</span>';});
    html+='<div class="fc"><div class="fch"><div class="fci"><div class="fcn">'+f.n+'</div><div class="fcc">'+f.c+'</div></div>'+
-    '<div class="fca"><button onclick="remFavFood(''+f.n.replace(/'/g,"\'")+'')" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer">Remove</button>'+
+    '<div class="fca"><button onclick="remFavFood(\''+f.n.replace(/'/g,"\\'")+'\')" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer">Remove</button>'+
     '<span class="bdg '+bc+'">'+(f.s==='allowed'?'&#10003;':f.s==='avoid'?'&#10007;':'~')+'</span></div></div>'+
     '<div class="dtags">'+tags+'</div>'+
     (f.p?'<div style="padding:0 13px 12px"><div class="dl">Prepare</div><div class="dtt dtp">'+f.p+'</div></div>':'')+
@@ -610,9 +610,9 @@ function renderFavs(){
   fM.forEach(function(m){
    var ingr='';m.i.forEach(function(x){ingr+='<li>'+x+'</li>';});
    var steps='';m.s.forEach(function(x){steps+='<li>'+x+'</li>';});
-   html+='<div class="mc"><div class="mch" onclick="this.parentElement.classList.toggle('open')">'+
+   html+='<div class="mc"><div class="mch" onclick="this.parentElement.classList.toggle(\'open\')">'+
     '<div><div class="mct">'+m.n+'</div><div class="mcm">'+m.tab.charAt(0).toUpperCase()+m.tab.slice(1)+' &middot; '+m.t+'</div></div>'+
-    '<div class="mcr"><button onclick="event.stopPropagation();remFavMeal(''+m.n.replace(/'/g,"\'")+'')" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer;margin-right:6px">Remove</button>'+chev+'</div></div>'+
+    '<div class="mcr"><button onclick="event.stopPropagation();remFavMeal(\''+m.n.replace(/'/g,"\\'")+'\')" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer;margin-right:6px">Remove</button>'+chev+'</div></div>'+
     '<div class="mcb"><div class="ms"><h4>Ingredients</h4><ul>'+ingr+'</ul></div>'+
     '<div class="ms"><h4>Steps</h4><ol>'+steps+'</ol></div>'+
     (m.nt?'<div class="nbox"><h4>Important note</h4><p>'+m.nt+'</p></div>':'')+
@@ -780,7 +780,7 @@ function renderRes(){
  var html='';
  RES.forEach(function(r,i){
   html+='<div class="rsec'+(i===0?' open':'')+'">'+
-   '<div class="rshd" onclick="this.parentElement.classList.toggle('open')">'+
+   '<div class="rshd" onclick="this.parentElement.classList.toggle(\'open\')">'+
    '<span class="rsi">'+r.icon+'</span>'+
    '<div class="rstw"><div class="rst">'+r.title+'</div><div class="rss">'+r.sub+'</div></div>'+
    chev+'</div>'+
