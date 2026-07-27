@@ -302,6 +302,11 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
 <div class="toast" id="toast"></div>
 <script>
 try {
+// ── AI PROXY CONFIG ──────────────────────────────────────
+// Recipe Builder and Scanner call this endpoint instead of Anthropic's API
+// directly, so your API key never has to be exposed in this public page.
+// Replace with the Worker URL you get after deploying the Cloudflare Worker.
+var API_PROXY_URL = 'https://roper-diet-proxy.roperwtxb.workers.dev';
 var LCATS = ["Produce","Meat & Seafood","Dairy & Eggs","Baking","Oils & Condiments","Beverages","Other"];
 var activeCats = {};
 var activeStatuses = {allowed:true,caution:true,avoid:true};
@@ -800,7 +805,7 @@ function setMealType(type, btn) {
  btn.classList.add('on');
 }
 
-async function buildRecipe() {
+window.buildRecipe = async function() {
  if(!curMealTypeChoice){toast('Please select a meal type first');return;}
  var ingredients = document.getElementById('builder-ingredients').value.trim();
  if(!ingredients){toast('Please enter some ingredients');return;}
@@ -812,12 +817,13 @@ async function buildRecipe() {
  resEl.innerHTML = '<div style="text-align:center;padding:24px;font-size:14px;color:var(--t2)">Creating a ' + curMealTypeChoice.toLowerCase() + ' recipe just for your family...</div>';
  var prompt = 'Create a ' + curMealTypeChoice + ' recipe using some or all of these available ingredients: ' + ingredients + '.' + (notes ? ' Special requests: ' + notes + '.' : '') + ' Only use ingredients from the list that comply with all four diet rules. You may suggest adding basic compliant pantry staples like sea salt, ghee, or water if needed.';
  try {
-  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+  var resp = await fetch(API_PROXY_URL, {
    method: 'POST',
    headers: {'Content-Type':'application/json'},
-   body: JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1500, system:BUILDER_PROMPT, messages:[{role:'user',content:prompt}]})
+   body: JSON.stringify({model:'claude-sonnet-5', max_tokens:1500, system:BUILDER_PROMPT, messages:[{role:'user',content:prompt}]})
   });
   var data = await resp.json();
+  if(data.error){throw new Error(data.error.message || 'The recipe service returned an error.');}
   var rawText = data.content && data.content.find(function(b){return b.type==='text';});
   rawText = rawText ? rawText.text : '';
   var recipe = JSON.parse(rawText.replace(/```json|```/g,'').trim());
@@ -848,7 +854,7 @@ async function buildRecipe() {
  }
  btn.disabled = false;
  btn.innerHTML = '&#127859; Build My Recipe';
-}
+};
 
 function saveGeneratedRecipe(genId, btn) {
  var recipe = window['genRecipe_' + genId];
@@ -894,7 +900,7 @@ document.getElementById('pinput').addEventListener('keydown',function(e){if(e.ke
 
 var SYSPROMPT='You are a dietary expert helping parents of a 4-year-old girl on a strict combined diet: 1. GLUTEN-FREE: no wheat, barley, rye, regular oats 2. EXTREMELY LOW SUGAR: no added sugars, minimal natural sugars, no syrups, no juice 3. LOW HISTAMINE: avoid aged/fermented/canned foods, tomatoes, citrus, strawberries, avocado, vinegar, alcohol, long-cooked broth 4. GAPS DIET: no grains (including rice, corn, oats), no starchy vegetables (potatoes), no legumes, no processed foods. Allowed: fresh meats, eggs, non-starchy vegetables, nuts/seeds, raw honey in tiny amounts. Respond ONLY in this exact JSON (no markdown): {"verdict":"allowed|caution|avoid","productName":"string","summary":"one sentence","dietBreakdown":{"glutenFree":{"status":"ok|caution|no","reason":"brief"},"lowSugar":{"status":"ok|caution|no","reason":"brief"},"lowHistamine":{"status":"ok|caution|no","reason":"brief"},"gaps":{"status":"ok|caution|no","reason":"brief"}},"keyIssues":["array"],"saferAlternative":"string or null"}';
 
-async function doScan(){
+window.doScan = async function(){
  var btn=document.getElementById('scanbtn');
  var resEl=document.getElementById('scanResult');
  var txt=document.getElementById('pinput').value.trim();
@@ -905,8 +911,9 @@ async function doScan(){
   var messages;
   if(photoB64)messages=[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:photoB64}},{type:"text",text:"Analyze this product label for the diet described."}]}];
   else messages=[{role:"user",content:'Analyze this product: "'+txt+'"'}];
-  var resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:SYSPROMPT,messages:messages})});
+  var resp=await fetch(API_PROXY_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1000,system:SYSPROMPT,messages:messages})});
   var data=await resp.json();
+  if(data.error){throw new Error(data.error.message || 'The scanner service returned an error.');}
   var rawText=data.content&&data.content.find(function(b){return b.type==='text';});
   rawText=rawText?rawText.text:'';
   var result=JSON.parse(rawText.replace(/```json|```/g,'').trim());
@@ -922,7 +929,7 @@ async function doScan(){
   resEl.innerHTML='<div class="rbox rca"><div class="rtitle">Analysis failed</div><div class="rbody">Check your network and try again.<br><small style="color:var(--t3)">'+err.message+'</small></div></div>';
  }
  btn.disabled=false;btn.innerHTML='Check this product';
-}
+};
 
 // ── INIT ────────────────────────────────────────────────
 load();
