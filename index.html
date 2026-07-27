@@ -152,16 +152,17 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
 .rsbd em{font-style:italic}
 .cite{font-size:11px;color:var(--t3);font-style:italic;margin-bottom:10px}
 .empty{text-align:center;padding:36px 20px;color:var(--t3);font-size:14px;line-height:1.6}
+.mtype-btn.on{background:var(--gl);border-color:var(--g);color:var(--gd);font-weight:700}
+.gen-card{background:var(--bg);border:2px solid var(--g);border-radius:12px;padding:15px;margin-top:4px}
+.gen-title{font-size:17px;font-weight:700;color:var(--gd);margin-bottom:4px}
+.gen-meta{font-size:12px;color:var(--t3);margin-bottom:12px}
+.gen-save{margin-top:12px;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;border:1px solid var(--g);background:var(--gl);color:var(--gd);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.gen-save:active{background:var(--g);color:#fff}
+.gen-save.saved{background:var(--g);color:#fff}
+.gen-addlist{margin-top:8px;margin-left:8px;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a18;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;transition:transform .3s;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0)}
 </style>
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<meta name="theme-color" content="#1a1a18">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Diet Guide">
 </head>
 <body>
 <nav class="nav">
@@ -178,8 +179,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
    <button class="tab" onclick="goTab('favs',this)">Saved &#9829;</button>
    <button class="tab" onclick="goTab('rx',this)">Reactions <span class="cbdg" id="rxc" style="display:none">0</span></button>
    <button class="tab" onclick="goTab('res',this)">Resources</button>
-   <button class="tab" onclick="goTab('dining',this)">Dining Out</button>
-   <button class="tab" onclick="goTab('reintro',this);initReintroTab()">Reintro</button>
+   <button class="tab" onclick="goTab('builder',this)">&#127859; Recipe Builder</button>
   </div>
  </div>
 </nav>
@@ -206,33 +206,18 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
 </div>
 
 <div class="pg" id="pg-meals">
- <div class="sw" style="margin-bottom:10px">
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-  <input class="si" id="mealIngSrch" type="text" placeholder="Search meals by ingredient (e.g. zucchini, chicken)..." oninput="filterMealsByIngredient(this.value)"/>
+ <div class="stabs" id="mealTabs">
+  <button class="stab on" onclick="setMT('breakfast',this)">&#9728; Breakfast</button>
+  <button class="stab" onclick="setMT('lunch',this)">Lunch</button>
+  <button class="stab" onclick="setMT('dinner',this)">Dinner</button>
+  <button class="stab" onclick="setMT('snacks',this)">Snacks</button>
+  <button class="stab" onclick="setMT('beverages',this)">Beverages</button>
  </div>
- <div id="mealNormalArea">
-  <div class="stabs" id="mealTabs">
-   <button class="stab on" onclick="setMT('breakfast',this)">&#9728; Breakfast</button>
-   <button class="stab" onclick="setMT('lunch',this)">Lunch</button>
-   <button class="stab" onclick="setMT('dinner',this)">Dinner</button>
-   <button class="stab" onclick="setMT('snacks',this)">Snacks</button>
-   <button class="stab" onclick="setMT('beverages',this)">Beverages</button>
-  </div>
-  <div id="mealGrid"></div>
- </div>
- <div id="mealSearchResults" style="display:none"></div>
+ <div id="mealGrid"></div>
 </div>
 
 <div class="pg" id="pg-scanner">
  <div class="infobox"><strong>AI ingredient checker.</strong> Photo a product label or type a name to check it against all four diet rules.</div>
- <div class="infobox" id="keyBox" style="background:var(--bg2);border-color:var(--bdr);color:var(--t2)">
-  <strong>Anthropic API key</strong> &mdash; needed once per device for scanning. Stored only in this browser, never sent anywhere except Anthropic's API.
-  <div class="lc" style="margin-top:8px;margin-bottom:0">
-   <input class="liinp" id="apiKeyInput" type="password" placeholder="sk-ant-..."/>
-   <button class="addbtn" onclick="saveApiKey()">Save</button>
-  </div>
-  <div id="keyStatus" style="margin-top:6px;font-size:12px"></div>
- </div>
  <div class="scan-area" onclick="document.getElementById('photoInput').click()">
   <div style="font-size:36px;margin-bottom:8px">&#128247;</div>
   <div style="font-size:15px;font-weight:600;margin-bottom:3px">Take or upload a photo</div>
@@ -240,7 +225,6 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
  </div>
  <input type="file" id="photoInput" accept="image/*" capture="environment"/>
  <img id="pphoto" class="prev-img" style="display:none"/>
- <button id="clearPhotoBtn" class="lab" style="display:none;width:100%;margin-bottom:11px" onclick="clearPhoto()">&#10005; Remove photo</button>
  <div class="or-div">or type a product name</div>
  <div class="sw" style="margin-bottom:10px">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -279,217 +263,41 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
   <div class="frow"><label class="flbl">Additional notes (optional)</label><textarea class="finp" id="rx-notes" placeholder="Brand, symptoms, how long they lasted..." style="min-height:55px"></textarea></div>
   <button class="btn" style="margin-top:4px" onclick="addRx()">Save to reactions log</button>
  </div>
- <button class="lab" style="width:100%;margin-bottom:11px" onclick="exportReactionsPrint()">&#128424; Print / export log</button>
  <div id="rxLog"></div>
 </div>
 
 <div class="pg" id="pg-res">
  <div class="infobox" style="margin-bottom:14px"><strong>For reference only.</strong> Always work with your daughter's medical team when making dietary decisions.</div>
  <div id="resContent"></div>
-<div class="rsec">
- <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-  <div class="rsi">&#128190;</div>
-  <div class="rstw"><div class="rst">Backup &amp; Restore Your Data</div><div class="rss">Save your reactions, reintro log, and saved items to a file</div></div>
- </div>
- <div class="rsbd">
-  <h3>Why back up</h3>
-  <p style="font-size:13px;color:var(--t2);margin-bottom:10px">This app only saves your reactions log, reintroduction tracker, shopping list, and saved items in this browser. If you clear browser data, switch phones, or use a different browser, that history won&#39;t carry over unless you back it up first.</p>
-  <button class="btn" onclick="exportBackup()">&#11015;&#65039; Export backup file</button>
-  <div style="margin-top:12px">
-   <label class="btn" style="display:inline-block;cursor:pointer" for="restoreFileInput">&#11014;&#65039; Restore from backup file</label>
-   <input type="file" id="restoreFileInput" accept="application/json" style="display:none" onchange="restoreBackup(this.files[0])">
-  </div>
-  <div id="backupMsg" style="margin-top:10px;font-size:13px;color:var(--t2)"></div>
- </div>
-</div>
 </div>
 
-<div class="pg" id="pg-dining">
- <div class="infobox" style="margin-bottom:14px"><strong>Restaurant cheat sheet.</strong> A practical guide for eating out safely across all four diet rules. It's okay to tell staff this is a medical necessity for a child, not a preference &mdash; most kitchens take that seriously and will work with you.</div>
- <button class="lab" style="width:100%;margin-bottom:14px" onclick="window.print()">&#128424; Print this page</button>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#128483;</div>
-   <div class="rstw"><div class="rst">Before You Go &amp; What to Say</div><div class="rss">Planning ahead and talking to staff</div></div>
+<div class="pg" id="pg-builder">
+ <div class="infobox"><strong>AI Recipe Builder.</strong> Tell us what meal you want and what ingredients you have. The AI will create a recipe that follows all four diet rules for your daughter.</div>
+ <div style="background:var(--bg);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+  <div class="frow">
+   <label class="flbl">What meal are you making?</label>
+   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px" id="mealTypeBtns">
+    <button class="svb" onclick="setMealType('Breakfast',this)" style="padding:10px 6px;font-size:13px">&#9728; Breakfast</button>
+    <button class="svb" onclick="setMealType('Lunch',this)" style="padding:10px 6px;font-size:13px">Lunch</button>
+    <button class="svb" onclick="setMealType('Dinner',this)" style="padding:10px 6px;font-size:13px">Dinner</button>
+    <button class="svb" onclick="setMealType('Snack',this)" style="padding:10px 6px;font-size:13px">Snack</button>
+    <button class="svb" onclick="setMealType('Beverage',this)" style="padding:10px 6px;font-size:13px">Beverage</button>
+   </div>
   </div>
-  <div class="rsbd">
-   <h3>Plan ahead</h3>
-   <ul>
-    <li>Look at the menu online first and call during a quiet time (mid-afternoon, not peak dinner rush) to ask questions.</li>
-    <li>Favor restaurants built around simple grilled or roasted protein and vegetables over anything sauce-heavy or fried.</li>
-    <li>Bring this page (or a screenshot) to hand to the server or kitchen if it helps.</li>
-   </ul>
-   <h3>What to say</h3>
-   <ul>
-    <li>Tell the server it's a medical necessity, not a preference &mdash; staff are usually more careful and more willing to check with the kitchen.</li>
-    <li>Ask for the simplest possible version: protein cooked plain, vegetables steamed or roasted with nothing added, sauces and dressings left off or served on the side.</li>
-    <li>Ask specifically: is the fryer shared with breaded food? Is a separate pan or fresh oil used? Does the sauce or seasoning contain flour, soy sauce, vinegar, or added sugar?</li>
-    <li>Once the food arrives, confirm with the server that it was made exactly as requested before eating.</li>
-   </ul>
-   <p class="cite">Celiac Disease Foundation, Dining and Social Eating; National Celiac Association, Eating Out; Through The Fibro Fog, 10 Tips for Eating Out on a Low Histamine Diet</p>
+  <div class="frow" style="margin-top:12px">
+   <label class="flbl">What ingredients do you have?</label>
+   <textarea class="finp" id="builder-ingredients" placeholder="e.g. chicken thighs, zucchini, carrots, ghee, garlic, sea salt, fresh thyme..." style="min-height:90px"></textarea>
+   <div style="font-size:11px;color:var(--t3);margin-top:4px">Type everything you have available. The more you list the better the recipe.</div>
   </div>
+  <div class="frow" style="margin-top:4px">
+   <label class="flbl">Any special requests? (optional)</label>
+   <input class="finp" id="builder-notes" type="text" placeholder="e.g. something quick, soft texture for a 4 year old, no eggs..."/>
+  </div>
+  <button class="btn" id="builderbtn" onclick="buildRecipe()" style="margin-top:8px">&#127859; Build My Recipe</button>
  </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#128680;</div>
-   <div class="rstw"><div class="rst">Universal Red Flags</div><div class="rss">Ask about these at every restaurant, any cuisine</div></div>
-  </div>
-  <div class="rsbd">
-   <ul>
-    <li><strong>Soy sauce &amp; teriyaki</strong> &mdash; brewed with wheat (gluten) and fermented (high histamine). Hides in marinades, stir-fries, fried rice, and glazes.</li>
-    <li><strong>Vinegar &amp; vinegar-based sauces</strong> &mdash; ketchup, mustard, mayonnaise, BBQ sauce, ranch, most salad dressings. All fermented, all high histamine.</li>
-    <li><strong>Aged, cured, or smoked foods</strong> &mdash; aged cheese, deli meat, bacon, sausage, smoked fish. Among the highest histamine foods there are.</li>
-    <li><strong>Anything that's been sitting or reheated</strong> &mdash; soup of the day, slow-simmered sauces, stews made hours earlier. Histamine climbs the longer food sits, even after cooking.</li>
-    <li><strong>Shared fryer oil or shared grill</strong> &mdash; if breaded or battered food is cooked in the same oil or surface, that's a gluten cross-contact risk.</li>
-    <li><strong>Pre-made marinades and sauces in general</strong> &mdash; usually built on sugar, vinegar, or soy sauce even when it isn't obvious.</li>
-    <li><strong>Artificial food dyes</strong> (Yellow 5, Yellow 6, Red 40, Red 3) &mdash; turn up in sauces, drink mixes, and kids' menu items. Some children react with skin or behavior changes.</li>
-    <li><strong>MSG / "flavor enhancer"</strong> &mdash; common in fried rice, broths, and seasoning blends, especially at Asian-American and fast food chains.</li>
-    <li><strong>Sulfites</strong> &mdash; dried fruit, some salad bars, and vinegar-based sauces.</li>
-   </ul>
-   <p class="cite">Celiac.com, dining out tips; Healing Histamine, Eating Out with Histamine Intolerance; Healthline, Foods with MSG; Naturally Savvy, Food Additives to Avoid</p>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#9989;</div>
-   <div class="rstw"><div class="rst">Safe Bets, Almost Anywhere</div><div class="rss">A go-to order that works at most restaurants</div></div>
-  </div>
-  <div class="rsbd">
-   <ul>
-    <li>Plain grilled, baked, or roasted protein with nothing added &mdash; chicken, steak, a burger patty with no bun, or very fresh fish.</li>
-    <li>Steamed or roasted plain vegetables &mdash; ask for olive oil, ghee, or butter instead of a butter substitute or seed oil.</li>
-    <li>A side salad with oil and salt/pepper only, no dressing (dressings are almost always vinegar-based).</li>
-    <li>A plain baked potato, or ask to swap starch for extra vegetables.</li>
-    <li>Ask for any sauce "on the side" or left off entirely so you control what touches the food.</li>
-   </ul>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#129385;</div>
-   <div class="rstw"><div class="rst">Steakhouse / Brazilian Steakhouse</div><div class="rss">Best-fit cuisine &mdash; built around plain grilled meat</div></div>
-  </div>
-  <div class="rsbd">
-   <p>The easiest cuisine for this combination of diets. The meal is built around meat seasoned with just salt and fire, so there's very little to hide.</p>
-   <h3>Order</h3>
-   <ul><li>Meat seasoned with salt only, no marinade, no butter baste or glaze.</li></ul>
-   <h3>Watch for</h3>
-   <ul><li>Shared salad bar items &mdash; cured meats, cheese, and vinegar dressings often sit right next to safe options.</li></ul>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#127791;</div>
-   <div class="rstw"><div class="rst">Mexican</div><div class="rss">Good, with a few swaps</div></div>
-  </div>
-  <div class="rsbd">
-   <p>Corn tortillas, plain grilled meats (carne asada, pollo asado), and rice give a naturally gluten-free base.</p>
-   <h3>Order</h3>
-   <ul><li>Meat grilled plain, corn tortillas (confirm corn only, not a corn/flour blend), plain rice.</li></ul>
-   <h3>Watch for</h3>
-   <ul><li>Flour tortillas, shredded cheese, sour cream, tomato-based salsas (histamine), and canned refried beans, which often carry additives.</li></ul>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#127836;</div>
-   <div class="rstw"><div class="rst">Thai / Vietnamese</div><div class="rss">Good, with a few swaps</div></div>
-  </div>
-  <div class="rsbd">
-   <p>Rice noodles, rice dishes, fresh herbs, and grilled meats are a solid starting point.</p>
-   <h3>Order</h3>
-   <ul><li>Ask for the dish made without soy sauce or fish sauce, with any sauce on the side.</li></ul>
-   <h3>Watch for</h3>
-   <ul><li>Fish sauce and soy sauce turn up in almost everything, along with peanut sauce, tamarind, and MSG in broths.</li></ul>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#127823;</div>
-   <div class="rstw"><div class="rst">Indian</div><div class="rss">Good, with a few swaps</div></div>
-  </div>
-  <div class="rsbd">
-   <p>Tandoori-grilled meats and plain rice can work well.</p>
-   <h3>Order</h3>
-   <ul><li>Meat grilled plain, without the yogurt marinade, and dishes without a cream sauce.</li></ul>
-   <h3>Watch for</h3>
-   <ul><li>Yogurt marinades (dairy plus fermentation), heavy cream sauces, and chutneys, which are usually vinegar or fruit-based and fermented.</li></ul>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#127843;</div>
-   <div class="rstw"><div class="rst">Japanese / Sushi</div><div class="rss">Highest risk &mdash; needs extra care or best skipped</div></div>
-  </div>
-  <div class="rsbd">
-   <p>This is the hardest cuisine for this combination of diets, for two separate reasons: traditional soy sauce is brewed with wheat, and sushi rice vinegar is sometimes seasoned with a wheat-based product &mdash; both a gluten problem. Separately, raw and aged fish is one of the highest histamine-risk foods there is, since histamine builds the longer fish sits after being caught.</p>
-   <h3>If you go anyway</h3>
-   <ul><li>Ask specifically for tamari (gluten-free soy sauce) and a cooked option made with fish prepared that day, not sitting in a case.</li></ul>
-   <p class="cite">My Japanese World, Is Soy Sauce Gluten-Free; Endless Distances, Gluten Free Japan Guide</p>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#127829;</div>
-   <div class="rstw"><div class="rst">Italian</div><div class="rss">Risky &mdash; needs a simplified order</div></div>
-  </div>
-  <div class="rsbd">
-   <p>Pasta is the obvious problem, but tomato sauce simmered for hours, aged parmesan, cured meats (prosciutto, salami), and balsamic vinegar are just as much of a concern.</p>
-   <h3>Order</h3>
-   <ul><li>A simply grilled protein with olive oil and a plain vegetable side. Skip the pasta, red sauce, and cheese entirely.</li></ul>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#127828;</div>
-   <div class="rstw"><div class="rst">American Diner / Grill / BBQ</div><div class="rss">Doable with a plain order</div></div>
-  </div>
-  <div class="rsbd">
-   <h3>Order</h3>
-   <ul><li>A plain burger patty (no bun, no cheese), grilled chicken, plain eggs, or steamed vegetables tend to work.</li></ul>
-   <h3>Watch for</h3>
-   <ul><li>BBQ sauce (sugar, vinegar, and often gluten), pre-seasoned patties, a shared griddle with buns, bacon, deli meat, and coleslaw (vinegar-based dressing).</li></ul>
-  </div>
- </div>
-
- <div class="rsec">
-  <div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
-   <div class="rsi">&#127839;</div>
-   <div class="rstw"><div class="rst">Fast Food</div><div class="rss">Generally best avoided</div></div>
-  </div>
-  <div class="rsbd">
-   <p>Most fast food relies on batter, shared fryers, pre-made sauces, and additives like MSG and food dyes &mdash; several diet rules get broken at once. If it's unavoidable, a plain grilled item with no bun and no sauce is the least-risky option, but this should be the rare exception, not a routine choice.</p>
-   <p class="cite">Food Babe, Fast-Food Chains That Hide Their Ingredients</p>
-  </div>
- </div>
+ <div id="builderResult"></div>
 </div>
 
-<div class="pg" id="pg-reintro">
- <div class="infobox" style="margin-bottom:14px"><strong>Reintroduction tracker.</strong> Log each new food one at a time and wait before trying the next, so any reaction can be clearly linked to a single food. General elimination-diet guidance suggests waiting about 3&ndash;4 days between new foods (GAPS suggests every 2&ndash;3 days once gut healing is well underway). Because of her seizure history, always follow your daughter's medical team's specific guidance on timing and which food to try next.</div>
- <div id="reintroSummary"></div>
- <div class="rxform">
-  <h3>Log a new food to try</h3>
-  <div class="frow"><label class="flbl">Food or ingredient *</label><input class="finp" id="ri-food" type="text" placeholder="e.g. Sweet potato"/></div>
-  <div class="frow2">
-   <div><label class="flbl">Date introduced</label><input class="finp" id="ri-date" type="date"/></div>
-   <div><label class="flbl">Wait before next food</label><select class="finp" id="ri-wait"><option value="3">3 days</option><option value="4" selected>4 days</option><option value="5">5 days</option><option value="7">7 days</option></select></div>
-  </div>
-  <div class="frow"><label class="flbl">Starting amount / dose</label><input class="finp" id="ri-dose" type="text" placeholder="e.g. 1 teaspoon at breakfast"/></div>
-  <div class="frow"><label class="flbl">Notes (optional)</label><textarea class="finp" id="ri-notes" placeholder="How it was prepared, anything else to remember..." style="min-height:55px"></textarea></div>
-  <button class="btn" style="margin-top:4px" onclick="addReintro()">Save to reintroduction log</button>
- </div>
- <div id="reintroLog"></div>
-</div>
 <div class="toast" id="toast"></div>
 <script>
 try {
@@ -498,11 +306,11 @@ var activeCats = {};
 var activeStatuses = {allowed:true,caution:true,avoid:true};
 var openFood = null, openMeal = null, curMealTab = 'breakfast', openRx = null;
 var favorites = {foods:[],meals:[]};
+var generatedRecipes = [];
 var shopList = [];
 var reactions = [];
 var listCatFilter = 'All';
 var photoB64 = null, rxSev = 'mild';
-var apiKey = '';
 var resBuilt = false;
 
 // ── FOODS DATA ──────────────────────────────────────────
@@ -557,130 +365,7 @@ var FOODS = [
  {n:"Peppermint tea",c:"Drinks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Brew light. Dilute for young children.",t:"Supports digestion.",sh:"Beverages"},
  {n:"Ginger tea (fresh)",c:"Drinks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steep fresh ginger slices in hot water. Cool well before serving.",t:"Anti-inflammatory and digestive support.",sh:"Beverages"},
  {n:"Fruit juices",c:"Drinks",s:"avoid",d:{gf:"ok",ls:"no",lh:"caution",g:"no"},p:"Avoid all juices.",t:"Very high sugar. Not GAPS-approved.",sh:""},
- {n:"Cow milk / plant milks",c:"Drinks",s:"avoid",d:{gf:"caution",ls:"caution",lh:"ok",g:"no"},p:"Avoid. Not GAPS protocol.",t:"Not suitable for GAPS diet.",sh:""},
- {n:"Ground beef (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further). Great formed into patties or crumbled for a quick pan-sear/air-fry.",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Ground turkey (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Ground chicken (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Ground lamb (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Naturally lower histamine than beef for many families. Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Ground pork (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Pork runs slightly higher histamine than beef/lamb even fresh.",sh:"Meat & Seafood"},
- {n:"Chicken breast (fresh, boneless)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Pressure-cooking or air-frying keeps it moist without long cook time.",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Chicken thighs/drumsticks (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Bake at standard oven temp (375-400F) rather than a long slow-roast.",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Beef steak (fresh, e.g. sirloin)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Pan-sear quickly or bake/air-fry. Skip the grill if possible \u2014 grilling specifically raises histamine and char compounds more than other fast methods.",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Beef roast (fresh, for slicing)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"If you can, pressure-cook or bake at normal heat instead of an 8+ hour slow-cooker roast \u2014 the long slow-cook time is what raises histamine most for roasts.",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Venison (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Lean wild game, often very well tolerated. Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Bison (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Duck (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Richer/fattier than chicken; introduce in small amounts.",sh:"Meat & Seafood"},
- {n:"Goat meat (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Often very well tolerated, similar to lamb.",sh:"Meat & Seafood"},
- {n:"Rabbit (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Very lean; pairs well with ghee to add fat back in.",sh:"Meat & Seafood"},
- {n:"Cod / white fish fillet (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Poach, steam, bake, or air-fry immediately \u2014 fish should be cooked the same day it's purchased, ideally within hours.",t:"Histamine rises extremely fast in all fish, even more than meat.",sh:"Meat & Seafood"},
- {n:"Salmon (fresh, wild-caught)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Bake or air-fry same day as purchase. Do not let raw or cooked salmon sit in the fridge.",t:"Naturally oilier fish can run higher in histamine than white fish.",sh:"Meat & Seafood"},
- {n:"Shellfish (shrimp, crab, lobster)",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"caution"},p:"Avoid.",t:"Among the highest histamine-risk seafood; histamine forms very rapidly after catch.",sh:""},
- {n:"Scallops (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Sear quickly and eat immediately; do not store leftovers.",t:"Lower risk than shrimp/crab but still a fast-histamine food.",sh:"Meat & Seafood"},
- {n:"Chicken liver (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Pan-sear briefly or bake. Very fresh only.",t:"Nutrient-dense organ meat; introduce slowly and in small amounts.",sh:"Meat & Seafood"},
- {n:"Beef liver (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Pan-sear briefly, don't overcook. Very fresh only.",t:"Excellent iron/B12 source; some find organ meats slightly higher histamine.",sh:"Meat & Seafood"},
- {n:"Beef bone marrow (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Roast at normal heat 15-20 min, not a long slow-roast.",t:"Nutrient-dense traditional GAPS food.",sh:"Meat & Seafood"},
- {n:"Egg yolks (fresh, raw for GAPS intro)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Use only very fresh eggs; stir into warm (not hot) food just before serving.",t:"Classic GAPS intro food. Yolk first, whole egg once tolerated.",sh:"Dairy & Eggs"},
- {n:"Egg whites (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Cook fully (soft or hard). Introduce after yolks are well tolerated.",t:"Egg white is more likely than yolk to cause a reaction in sensitive kids.",sh:"Dairy & Eggs"},
- {n:"Turkey breast (fresh, boneless)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Best cooked fast: air fry, bake/roast at normal heat, pressure-cook (Instant Pot), or boil/steam \u2014 these keep total cook time short, which keeps histamine lowest. Avoid the slow cooker/crockpot (8+ hr on low raises histamine the most) and avoid grilling/charring (heat + smoke raises histamine and can irritate further).",t:"Buy fresh, cook same day, eat right away or freeze immediately \u2014 never let cooked meat sit or reheat more than once.",sh:"Meat & Seafood"},
- {n:"Bacon (cured, incl. \"uncured\"/nitrate-free labels)",c:"Proteins",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid.",t:"Curing (even \"natural\" celery-powder curing) drives histamine and sodium way up; not a fresh meat.",sh:""},
- {n:"Sausage (store-bought, any type)",c:"Proteins",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid.",t:"Processed, usually contains sugar, preservatives, and fillers.",sh:""},
- {n:"Beef jerky (store-bought)",c:"Proteins",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid.",t:"Cured, sweetened, and often soy-sauce marinated.",sh:""},
- {n:"Smoked salmon / smoked fish",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"caution",lh:"no",g:"caution"},p:"Avoid.",t:"Smoking is a preservation process that concentrates histamine heavily.",sh:""},
- {n:"Bell peppers, green/yellow (fresh)",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast, saute, or steam.",t:"Milder than red bell peppers; generally well tolerated cooked.",sh:"Produce"},
- {n:"Bell peppers, red/ripe (fresh)",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Cook well if used.",t:"Riper peppers run a bit higher in histamine than green/yellow.",sh:"Produce"},
- {n:"Frozen mixed vegetables (plain, unseasoned)",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam or saute straight from frozen.",t:"Flash-frozen shortly after harvest \u2014 often fresher (and lower histamine) than produce that's been sitting.",sh:"Produce"},
- {n:"Frozen broccoli",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam from frozen; avoid overcooking to mush.",t:"Good freezer staple for GAPS meals.",sh:"Produce"},
- {n:"Frozen cauliflower",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam or roast from frozen.",t:"",sh:"Produce"},
- {n:"Frozen green beans",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam or saute in ghee.",t:"",sh:"Produce"},
- {n:"Frozen peas",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"Steam briefly.",t:"Peas are botanically a legume, which GAPS excludes; use sparingly if at all during strict GAPS.",sh:"Produce"},
- {n:"Frozen butternut squash (cubed)",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam or roast from frozen \u2014 same prep as fresh.",t:"Convenient freezer alternative to fresh squash.",sh:"Produce"},
- {n:"Frozen berries, unsweetened (any type)",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Thaw and serve, or blend into a smoothie.",t:"Flash-frozen at peak ripeness; a reliable low-sugar-fruit staple year-round.",sh:"Produce"},
- {n:"Kale",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Cook well (steam or saute) \u2014 avoid raw.",t:"Leafy green; moderate histamine, similar caution to spinach.",sh:"Produce"},
- {n:"Brussels sprouts",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast or steam until tender.",t:"",sh:"Produce"},
- {n:"Celery",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Cook well in soups/stews; raw in small amounts if tolerated.",t:"Some low-histamine lists flag celery as borderline; watch for reaction.",sh:"Produce"},
- {n:"Radishes",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Cooked or thin-sliced raw.",t:"Generally well tolerated in small amounts.",sh:"Produce"},
- {n:"Turnips",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Boil or roast until soft, mash like potato.",t:"A good grain-free, low-starch potato substitute.",sh:"Produce"},
- {n:"Parsnips",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"Roast or mash if used.",t:"Starchy root vegetable \u2014 excluded on strict/intro GAPS like potato.",sh:"Produce"},
- {n:"Beets",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"caution",lh:"caution",g:"ok"},p:"Roast or boil until soft.",t:"Naturally higher in sugar; some report histamine sensitivity to beets.",sh:"Produce"},
- {n:"Fennel bulb",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast, braise, or saute.",t:"Related to fennel herb/seed, generally low histamine.",sh:"Produce"},
- {n:"Leeks",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Cook well, like onion.",t:"",sh:"Produce"},
- {n:"Bok choy",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam or stir-fry in ghee.",t:"",sh:"Produce"},
- {n:"Okra",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast or saute.",t:"",sh:"Produce"},
- {n:"Yellow summer squash",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam, saute, or roast \u2014 same prep as zucchini.",t:"",sh:"Produce"},
- {n:"Pumpkin",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"caution",lh:"no",g:"caution"},p:"Avoid.",t:"Flagged high-histamine on several low-histamine food lists; use butternut squash instead.",sh:""},
- {n:"Mushrooms (any type)",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"caution"},p:"Avoid.",t:"Fungi are a well-known histamine liberator / high-histamine food.",sh:""},
- {n:"Artichoke",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Steam or bake well.",t:"Moderate histamine reports; introduce slowly.",sh:"Produce"},
- {n:"Snap peas / snow peas",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"ok",lh:"ok",g:"no"},p:"Steam lightly.",t:"Legume-family pod vegetable, excluded on strict GAPS.",sh:"Produce"},
- {n:"Bean sprouts",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"no"},p:"Avoid.",t:"Sprouted legumes; excluded on GAPS and can be higher histamine.",sh:""},
- {n:"Cherries (fresh)",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Pitted and fresh, or lightly stewed.",t:"Considered a safe low-histamine fruit.",sh:"Produce"},
- {n:"Watermelon",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh, cubed.",t:"",sh:"Produce"},
- {n:"Cantaloupe / honeydew melon",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh, cubed.",t:"",sh:"Produce"},
- {n:"Mango (ripe)",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh, peeled and sliced.",t:"Higher in natural sugar \u2014 small portions.",sh:"Produce"},
- {n:"Kiwi",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh, peeled.",t:"",sh:"Produce"},
- {n:"Persimmon",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh, ripe and soft.",t:"",sh:"Produce"},
- {n:"Raspberries",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh.",t:"Lower sugar than many fruits.",sh:"Produce"},
- {n:"Blackberries",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh.",t:"",sh:"Produce"},
- {n:"Peaches (fresh, ripe)",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh, peeled, or lightly stewed.",t:"",sh:"Produce"},
- {n:"Plums",c:"Fruits",s:"caution",d:{gf:"ok",ls:"caution",lh:"caution",g:"ok"},p:"Fresh, ripe, peeled if tolerated.",t:"Some report mild sensitivity to stone fruits; watch for reaction.",sh:"Produce"},
- {n:"Grapes",c:"Fruits",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh, halved for young children (choking hazard whole).",t:"Higher natural sugar than most low-sugar fruit choices.",sh:"Produce"},
- {n:"Coconut meat / unsweetened coconut flakes",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Fresh or dried unsweetened, as a snack or shredded into baking.",t:"Great fat-forward, low-sugar treat.",sh:"Baking"},
- {n:"Dried fruit (raisins, dates, apricots, etc.)",c:"Fruits",s:"avoid",d:{gf:"ok",ls:"no",lh:"no",g:"caution"},p:"Avoid.",t:"Drying concentrates sugar and histamine, and often involves sulfite preservatives.",sh:""},
- {n:"Air-fried butternut squash fries",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Toss cubed/sliced squash with ghee and salt, air-fry 12-15 min.",t:"A french-fry swap the whole family can share.",sh:"Produce"},
- {n:"Air-fried zucchini chips",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Thin-slice zucchini, toss in ghee, air-fry until crisp.",t:"",sh:"Produce"},
- {n:"Macadamia nuts (raw)",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"caution"},p:"Serve whole (age-appropriate) or as nut butter for young children.",t:"Considered the most reliably low-histamine tree nut.",sh:"Baking"},
- {n:"Walnuts",c:"Snacks",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"caution"},p:"Raw or lightly toasted.",t:"Commonly flagged as a higher-histamine nut than macadamia/almond.",sh:"Baking"},
- {n:"Cashews",c:"Snacks",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"caution"},p:"Raw or lightly toasted.",t:"Moderate histamine reports; introduce slowly.",sh:"Baking"},
- {n:"Pumpkin seeds (raw or roasted)",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast plain in ghee/coconut oil and sea salt.",t:"",sh:"Baking"},
- {n:"Sunflower seeds (raw)",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Raw or lightly roasted, plain.",t:"",sh:"Baking"},
- {n:"Beef jerky (homemade, plain, no cure)",c:"Snacks",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Dehydrate thin-sliced fresh beef with just salt/herbs at low oven heat.",t:"Homemade avoids the sugar/nitrates/soy sauce in store versions, but dehydration still concentrates histamine somewhat.",sh:"Meat & Seafood"},
- {n:"Rice cakes",c:"Snacks",s:"avoid",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"Avoid.",t:"Rice is a grain, excluded on GAPS.",sh:""},
- {n:"Popcorn",c:"Snacks",s:"avoid",d:{gf:"ok",ls:"ok",lh:"ok",g:"no"},p:"Avoid.",t:"Corn is a grain, excluded on GAPS.",sh:""},
- {n:"Vegetable chips, store-bought (kale/beet/etc.)",c:"Snacks",s:"caution",d:{gf:"caution",ls:"caution",lh:"caution",g:"caution"},p:"Check the label every time.",t:"Oils, seasoning blends, and additives vary a lot by brand \u2014 use the Scanner to check a specific bag.",sh:""},
- {n:"Homemade fruit-puree popsicles (fruit + water only)",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Blend approved fruit with water, freeze in molds.",t:"A good frozen treat with no added sugar.",sh:"Produce"},
- {n:"Hard-boiled eggs",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Boil 9-10 min for fully set, cool in ice water, peel.",t:"Easy grab-and-go protein; eat same day, don't store peeled too long.",sh:"Dairy & Eggs"},
- {n:"Seed crackers (homemade, flax/chia + water + salt)",c:"Snacks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Mix ground flax or chia with water, spread thin, bake until crisp.",t:"A grain-free cracker alternative for dips.",sh:"Baking"},
- {n:"Trail mix (nuts/seeds/coconut, no dried fruit or chocolate)",c:"Snacks",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"caution"},p:"Mix macadamia, pumpkin seed, sunflower seed, coconut flake.",t:"Skip versions with raisins, cashews, or chocolate to keep it lower histamine and lower sugar.",sh:"Baking"},
- {n:"Fresh parsley",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Add fresh, at the end of cooking.",t:"",sh:"Produce"},
- {n:"Fresh basil",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Add fresh, at the end of cooking.",t:"",sh:"Produce"},
- {n:"Fresh oregano",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Cook in or add fresh.",t:"",sh:"Produce"},
- {n:"Fresh thyme",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Cook in soups, roasts.",t:"Used throughout the Meals recipes.",sh:"Produce"},
- {n:"Fresh rosemary",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Cook in roasts, stews.",t:"Used throughout the Meals recipes.",sh:"Produce"},
- {n:"Fresh dill",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Add fresh, at the end of cooking.",t:"",sh:"Produce"},
- {n:"Fresh mint",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Fresh, or steeped in tea.",t:"",sh:"Produce"},
- {n:"Fresh chives",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Add fresh, at the end of cooking.",t:"",sh:"Produce"},
- {n:"Fresh ginger (root)",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Grate or slice fresh into teas, soups, stir-fries.",t:"One of the best-tolerated warming spices on a low-histamine diet.",sh:"Produce"},
- {n:"Ground turmeric",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Add to warm milk, soups, roasted vegetables.",t:"Anti-inflammatory; used in the golden milk recipe.",sh:"Baking"},
- {n:"Ground cinnamon",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Add to baked goods, stewed fruit, warm drinks.",t:"Used throughout the Meals recipes.",sh:"Baking"},
- {n:"Sea salt",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Use freely to taste.",t:"",sh:"Baking"},
- {n:"Black pepper (fresh ground)",c:"Herbs & Spices",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Use in small amounts.",t:"Some strict low-histamine lists flag pepper as a mild irritant; most tolerate small amounts fine.",sh:"Baking"},
- {n:"Sweet paprika",c:"Herbs & Spices",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Use in small amounts.",t:"Milder than hot paprika, but still a nightshade-derived spice.",sh:"Baking"},
- {n:"Hot paprika / chili powder / cayenne / curry powder",c:"Herbs & Spices",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"caution"},p:"Avoid.",t:"Strong/hot spices are a common histamine trigger and are also too spicy for a young child.",sh:""},
- {n:"Cumin",c:"Herbs & Spices",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Use in small amounts.",t:"",sh:"Baking"},
- {n:"Cilantro",c:"Herbs & Spices",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Add fresh, in small amounts.",t:"Considered a possible mild histamine liberator by some sources; watch for reaction.",sh:"Produce"},
- {n:"Vanilla, alcohol-free (bean or powder)",c:"Herbs & Spices",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Add to baking.",t:"Prefer this over standard vanilla extract.",sh:"Baking"},
- {n:"Vanilla extract (standard, alcohol-based)",c:"Herbs & Spices",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Use sparingly if used.",t:"The alcohol base is a histamine concern for some; alcohol-free vanilla is the safer swap.",sh:"Baking"},
- {n:"Commercial spice blends (Italian seasoning, curry blends, etc.)",c:"Herbs & Spices",s:"avoid",d:{gf:"caution",ls:"caution",lh:"no",g:"caution"},p:"Avoid; season with single fresh herbs/spices instead.",t:"Pre-mixed blends often include glutamate/MSG-type additives that can trigger reactions.",sh:""},
- {n:"Coconut aminos",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Use anywhere you'd use soy sauce.",t:"A GAPS-friendly, gluten-free soy sauce substitute.",sh:"Oils & Condiments"},
- {n:"Soy sauce",c:"Fats & Oils",s:"avoid",d:{gf:"no",ls:"no",lh:"no",g:"no"},p:"Avoid; use coconut aminos instead.",t:"Contains gluten and is high histamine (fermented).",sh:""},
- {n:"Vinegar (any type, incl. apple cider)",c:"Fats & Oils",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"no"},p:"Avoid.",t:"All vinegar is fermented and high histamine \u2014 excluded across this protocol.",sh:""},
- {n:"Ketchup (store-bought)",c:"Fats & Oils",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid.",t:"Tomato + added sugar + vinegar \u2014 violates three of the four diets at once.",sh:""},
- {n:"Mustard (prepared, store-bought)",c:"Fats & Oils",s:"avoid",d:{gf:"caution",ls:"caution",lh:"no",g:"caution"},p:"Avoid.",t:"Almost always made with vinegar.",sh:""},
- {n:"Mayonnaise (store-bought)",c:"Fats & Oils",s:"avoid",d:{gf:"caution",ls:"caution",lh:"no",g:"no"},p:"Avoid.",t:"Typically made with seed oil and vinegar.",sh:""},
- {n:"Mayonnaise (homemade: egg yolk + olive oil, no vinegar)",c:"Fats & Oils",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Whisk fresh egg yolk with olive oil slowly; use fresh lemon juice sparingly or omit.",t:"Possible to make a compliant version at home; still contains raw egg and fresh-made-only shelf life.",sh:"Oils & Condiments"},
- {n:"Ranch dressing (store-bought)",c:"Fats & Oils",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid.",t:"Dairy + vinegar + sugar + additives.",sh:""},
- {n:"Avocado oil",c:"Fats & Oils",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Good for higher-heat cooking.",t:"The oil carries little of the histamine concern of avocado flesh, but introduce cautiously.",sh:"Oils & Condiments"},
- {n:"Beef tallow / lard (rendered, unsalted)",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Traditional cooking fat, use like ghee.",t:"",sh:"Oils & Condiments"},
- {n:"Duck fat",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Excellent for roasting vegetables.",t:"",sh:"Oils & Condiments"},
- {n:"Fresh cream (unprocessed, small amount)",c:"Dairy",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"caution"},p:"Small amounts in cooking.",t:"Introduces dairy fat/casein; watch for sensitivity like butter.",sh:"Dairy & Eggs"},
- {n:"Kefir (24hr homemade)",c:"Dairy",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Ferment like GAPS yogurt; start with 1 tsp and build slowly.",t:"Same fermentation caution as GAPS yogurt \u2014 introduce very slowly.",sh:"Dairy & Eggs"},
- {n:"Arrowroot starch",c:"Baking",s:"caution",d:{gf:"ok",ls:"ok",lh:"ok",g:"caution"},p:"Use as a thickener in small amounts.",t:"A full-GAPS (not intro) thickener option.",sh:"Baking"},
- {n:"Baking soda",c:"Baking",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Use as called for in recipes.",t:"Used throughout the Meals recipes.",sh:"Baking"},
- {n:"Cacao / chocolate (any form)",c:"Baking",s:"avoid",d:{gf:"ok",ls:"no",lh:"no",g:"no"},p:"Avoid.",t:"A well-known histamine liberator and typically high in sugar.",sh:""},
- {n:"Carob powder",c:"Baking",s:"caution",d:{gf:"ok",ls:"caution",lh:"caution",g:"ok"},p:"Use as an occasional chocolate substitute in baking.",t:"Less well studied than other ingredients here; introduce cautiously.",sh:"Baking"},
- {n:"Rooibos tea",c:"Drinks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Brew and cool to a warm, child-safe temperature.",t:"Naturally caffeine-free.",sh:"Beverages"},
- {n:"Sparkling mineral water (plain)",c:"Drinks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Serve plain, chilled or room temp.",t:"",sh:"Beverages"},
- {n:"Kombucha",c:"Drinks",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid.",t:"Fermented, and usually contains added sugar and sometimes fruit/citrus flavoring \u2014 violates low-sugar, low-histamine, and GAPS all at once.",sh:""},
- {n:"Coconut water (unsweetened)",c:"Drinks",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Serve chilled.",t:"Natural sugar content is higher than plain water.",sh:"Beverages"}
+ {n:"Cow milk / plant milks",c:"Drinks",s:"avoid",d:{gf:"caution",ls:"caution",lh:"ok",g:"no"},p:"Avoid. Not GAPS protocol.",t:"Not suitable for GAPS diet.",sh:""}
 ];
 
 // ── MEALS DATA ──────────────────────────────────────────
@@ -732,240 +417,6 @@ var MEALS = [
  {n:"Turmeric and ginger warm drink",tab:"beverages",t:"10 min",d:"An anti-inflammatory golden drink.",i:["1 cup full-fat coconut milk (clean label)","1/4 tsp ground turmeric","1/4 tsp fresh ginger grated","Pinch black pepper","Tiny raw honey (optional age 2+)"],s:["Warm coconut milk gently. Do not boil.","Whisk in turmeric, ginger and pepper.","Pour into cup. Add tiny honey if desired."],nt:"Turmeric is anti-inflammatory and gut-supportive.",sh:["Full-fat coconut milk (clean label)","Ground turmeric","Fresh ginger root","Raw honey"]}
 ];
 
-function filterMealsByIngredient(q){
- q=(q||'').trim().toLowerCase();
- var wrap=document.getElementById('mealSearchResults');
- var normalArea=document.getElementById('mealNormalArea');
- if(!q){
-  wrap.style.display='none';
-  wrap.innerHTML='';
-  if(normalArea) normalArea.style.display='';
-  return;
- }
- if(normalArea) normalArea.style.display='none';
- wrap.style.display='block';
- var tabLabel={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snacks:'Snacks',beverages:'Beverages'};
- var matches=MEALS.filter(function(m){
-  if(m.n && m.n.toLowerCase().indexOf(q)!==-1) return true;
-  if(m.i && m.i.some(function(ing){return ing.toLowerCase().indexOf(q)!==-1;})) return true;
-  return false;
- });
- var html='';
- if(matches.length===0){
-  html='<div class="empty">No meals found containing &#39;'+esc(q)+'&#39;. Try a different ingredient.</div>';
- } else {
-  html='<div style="font-size:12px;color:var(--t3);margin-bottom:10px">'+matches.length+' meal'+(matches.length===1?'':'s')+' found across all meal types</div>';
-  matches.forEach(function(m){
-   var ingList=m.i.map(function(x){return '<li>'+x+'</li>';}).join('');
-   var stepList=m.s.map(function(x){return '<li>'+x+'</li>';}).join('');
-   html+='<div class="mc">'+
-    '<div class="mch" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">'+
-     '<div><div class="mct">'+m.n+'</div><div class="mcm">'+(tabLabel[m.tab]||m.tab)+' &middot; '+m.t+'</div></div>'+
-     '<div class="mcr">'+chev+'</div>'+
-    '</div>'+
-    '<div class="mcb">'+
-     '<p style="font-size:13px;color:var(--t2);margin-bottom:8px">'+m.d+'</p>'+
-     '<div class="ms"><h4>Ingredients</h4><ul>'+ingList+'</ul></div>'+
-     '<div class="ms"><h4>Steps</h4><ol>'+stepList+'</ol></div>'+
-     (m.nt?'<div class="nbox"><h4>Note</h4><p>'+m.nt+'</p></div>':'')+
-    '</div>'+
-   '</div>';
-  });
- }
- wrap.innerHTML=html;
-}
-
-var reintros = null;
-function initReintroTab(){
- if(reintros===null){
-  try{ reintros = JSON.parse(localStorage.getItem('rdg_reintro')||'[]'); }catch(e){ reintros=[]; }
- }
- var d=document.getElementById('ri-date');
- if(d && !d.value){
-  var t=new Date();
-  var mm=String(t.getMonth()+1); if(mm.length<2) mm='0'+mm;
-  var dd=String(t.getDate()); if(dd.length<2) dd='0'+dd;
-  d.value=t.getFullYear()+'-'+mm+'-'+dd;
- }
- renderReintros();
-}
-function saveReintros(){ localStorage.setItem('rdg_reintro', JSON.stringify(reintros)); }
-function addReintro(){
- var foodEl=document.getElementById('ri-food');
- var dateEl=document.getElementById('ri-date');
- var food=(foodEl.value||'').trim();
- var date=dateEl.value;
- var wait=parseInt(document.getElementById('ri-wait').value,10)||4;
- var dose=(document.getElementById('ri-dose').value||'').trim();
- var notes=(document.getElementById('ri-notes').value||'').trim();
- if(!food || !date){ alert('Please enter a food name and date.'); return; }
- if(reintros===null) reintros=[];
- reintros.unshift({id:Date.now(), food:food, date:date, wait:wait, dose:dose, notes:notes, status:'watching'});
- saveReintros();
- foodEl.value='';
- document.getElementById('ri-dose').value='';
- document.getElementById('ri-notes').value='';
- renderReintros();
-}
-function markReintro(id, status){
- for(var i=0;i<reintros.length;i++){ if(reintros[i].id===id){ reintros[i].status=status; break; } }
- saveReintros();
- renderReintros();
-}
-function delReintro(id){
- reintros = reintros.filter(function(r){return r.id!==id;});
- saveReintros();
- renderReintros();
-}
-function riDaysBetween(dateStr){
- var start=new Date(dateStr+'T00:00:00');
- var now=new Date();
- var nowMid=new Date(now.getFullYear(),now.getMonth(),now.getDate());
- return Math.round((nowMid-start)/86400000);
-}
-function riFmtDate(d){
- return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
-}
-function renderReintros(){
- var sumEl=document.getElementById('reintroSummary');
- var logEl=document.getElementById('reintroLog');
- if(!sumEl||!logEl) return;
- if(!reintros || reintros.length===0){
-  sumEl.innerHTML='<div class="infobox" style="background:var(--bg2);border-color:var(--bdr);color:var(--t2)">No foods logged yet. Add the first one below to start tracking.</div>';
-  logEl.innerHTML='<div class="empty">Nothing logged yet.</div>';
-  return;
- }
- var latest=reintros[0];
- var elapsed=riDaysBetween(latest.date);
- var sumHtml='';
- if(latest.status==='watching'){
-  if(elapsed>=latest.wait){
-   sumHtml='<div class="infobox"><strong>Ready for the next food.</strong> '+latest.food+' has been watched for '+elapsed+' day'+(elapsed===1?'':'s')+' with no reaction logged.</div>';
-  } else {
-   var nd=new Date(latest.date+'T00:00:00'); nd.setDate(nd.getDate()+latest.wait);
-   sumHtml='<div class="infobox" style="background:var(--al);border-color:var(--a);color:var(--ad)"><strong>Watching '+latest.food+'</strong> &mdash; day '+elapsed+' of '+latest.wait+'. Safe to try the next new food on '+riFmtDate(nd)+' if no reaction.</div>';
-  }
- } else if(latest.status==='reaction'){
-  sumHtml='<div class="infobox" style="background:var(--rl);border-color:var(--r);color:var(--rd)"><strong>Reaction logged for '+latest.food+'.</strong> Pause new introductions and check with your daughter’s medical team before trying another food.</div>';
- } else {
-  sumHtml='<div class="infobox"><strong>'+latest.food+' was tolerated.</strong> Ready to log and try the next new food whenever you are.</div>';
- }
- sumEl.innerHTML=sumHtml;
- var html='';
- reintros.forEach(function(r){
-  var badge = r.status==='tolerated' ? '<span class="bdg bok">Tolerated</span>' : r.status==='reaction' ? '<span class="bdg bno">Reaction</span>' : '<span class="bdg bca">Watching</span>';
-  var el=riDaysBetween(r.date);
-  html+='<div class="rxcard">'+
-   '<div class="rxch" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">'+
-    '<div class="rxci"><div class="rxcn">'+r.food+'</div><div class="rxcd">'+riFmtDate(new Date(r.date+'T00:00:00'))+' &middot; day '+el+' of '+r.wait+'</div></div>'+
-    badge+
-   '</div>'+
-   '<div class="rxcb">'+
-    (r.dose? '<div class="dl">Amount</div><div class="dtt">'+r.dose+'</div>' : '')+
-    (r.notes? '<div class="dl">Notes</div><div class="dtt">'+r.notes+'</div>' : '')+
-    '<div class="la" style="margin-top:10px">'+
-     (r.status==='watching' ?
-      '<button class="lab" onclick="event.stopPropagation();markReintro('+r.id+',&#39;tolerated&#39;)">&#10003; Mark tolerated</button><button class="lab dng" onclick="event.stopPropagation();markReintro('+r.id+',&#39;reaction&#39;)">Mark reaction</button>'
-      : '<button class="lab" onclick="event.stopPropagation();markReintro('+r.id+',&#39;watching&#39;)">Reopen</button>')+
-     '<button class="lab dng" onclick="event.stopPropagation();delReintro('+r.id+')">Delete</button>'+
-    '</div>'+
-   '</div>'+
-  '</div>';
- });
- logEl.innerHTML=html;
-}
-
-function exportReactionsPrint(){
- if(!reactions || reactions.length===0){ alert('No reactions logged yet.'); return; }
- var rows = reactions.slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
- var sevLabel={mild:'Mild',mod:'Moderate',sev:'Severe'};
- var html = '<h1 style="font-family:sans-serif;margin-bottom:4px">Roper Diet Guide &mdash; Reaction &amp; Avoidance Log</h1>';
- html += '<p style="font-family:sans-serif;color:#555;margin-top:0">Exported '+new Date().toLocaleDateString()+' &middot; '+rows.length+' entr'+(rows.length===1?'y':'ies')+'</p>';
- html += '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:13px">';
- html += '<thead><tr style="background:#eee;text-align:left"><th style="padding:6px;border:1px solid #ccc">Date</th><th style="padding:6px;border:1px solid #ccc">Food / Product</th><th style="padding:6px;border:1px solid #ccc">Category</th><th style="padding:6px;border:1px solid #ccc">Severity</th><th style="padding:6px;border:1px solid #ccc">Reaction / Reason</th><th style="padding:6px;border:1px solid #ccc">Notes</th></tr></thead><tbody>';
- rows.forEach(function(r){
-  html += '<tr>'+
-   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top;white-space:nowrap">'+(r.date||'')+'</td>'+
-   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.name||'')+'</td>'+
-   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.cat||'')+'</td>'+
-   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(sevLabel[r.sev]||r.sev||'')+'</td>'+
-   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.reason||'')+'</td>'+
-   '<td style="padding:6px;border:1px solid #ccc;vertical-align:top">'+(r.notes||'')+'</td>'+
-  '</tr>';
- });
- html += '</tbody></table>';
-
- var area = document.getElementById('rxPrintArea');
- if(!area){
-  area = document.createElement('div');
-  area.id = 'rxPrintArea';
-  area.style.display = 'none';
-  document.body.appendChild(area);
-  var style = document.createElement('style');
-  style.id = 'rxPrintStyle';
-  style.innerHTML = '@media print { body > *:not(#rxPrintArea){display:none !important;} #rxPrintArea{display:block !important; position:absolute; top:0; left:0; width:100%; color:#000; background:#fff;} }';
-  document.head.appendChild(style);
- }
- area.innerHTML = html;
- window.print();
-}
-
-function exportBackup(){
- var data = {
-  app: 'roper-diet-guide-backup',
-  version: 1,
-  exported: new Date().toISOString(),
-  rdg_rx: localStorage.getItem('rdg_rx'),
-  rdg_fav: localStorage.getItem('rdg_fav'),
-  rdg_lst: localStorage.getItem('rdg_lst'),
-  rdg_reintro: localStorage.getItem('rdg_reintro')
- };
- var blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
- var url = URL.createObjectURL(blob);
- var a = document.createElement('a');
- var t = new Date();
- var mm = String(t.getMonth()+1); if(mm.length<2) mm='0'+mm;
- var dd = String(t.getDate()); if(dd.length<2) dd='0'+dd;
- a.href = url;
- a.download = 'roper-diet-guide-backup-' + t.getFullYear() + '-' + mm + '-' + dd + '.json';
- document.body.appendChild(a);
- a.click();
- document.body.removeChild(a);
- setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
- var msg = document.getElementById('backupMsg');
- if(msg) msg.textContent = 'Backup file downloaded.';
-}
-
-function restoreBackup(file){
- var msg = document.getElementById('backupMsg');
- if(!file){ return; }
- var reader = new FileReader();
- reader.onload = function(e){
-  var parsed;
-  try{ parsed = JSON.parse(e.target.result); }catch(err){
-   if(msg) msg.textContent = 'That file could not be read as a valid backup (invalid JSON).';
-   return;
-  }
-  if(!parsed || parsed.app !== 'roper-diet-guide-backup'){
-   if(msg) msg.textContent = 'That file does not look like a Roper Diet Guide backup.';
-   return;
-  }
-  if(!confirm('Restore this backup? This will replace your current reactions, reintro log, shopping list, and saved items in this browser.')){
-   return;
-  }
-  var keys = ['rdg_rx','rdg_fav','rdg_lst','rdg_reintro'];
-  keys.forEach(function(k){
-   if(typeof parsed[k] === 'string'){ localStorage.setItem(k, parsed[k]); }
-  });
-  if(msg) msg.textContent = 'Backup restored. Reloading...';
-  setTimeout(function(){ location.reload(); }, 800);
- };
- reader.onerror = function(){
-  if(msg) msg.textContent = 'Could not read that file.';
- };
- reader.readAsText(file);
-}
-
 // ── RESOURCES DATA ──────────────────────────────────────
 var RES = [
  {icon:"&#127807;",title:"Gluten-Free Diet",sub:"What it is and why it matters",body:"<h3>What is gluten?</h3><p>Gluten is a protein found in wheat, barley, rye and most oats. In people with celiac disease or gluten sensitivity it triggers an immune response that damages the small intestine lining, impairing nutrient absorption and causing widespread inflammation.</p><h3>What to avoid</h3><ul><li><strong>Wheat products</strong> - bread, pasta, flour, crackers, biscuits, pizza dough</li><li><strong>Barley and rye</strong> - often in soups, cereals, malt products</li><li><strong>Hidden gluten</strong> - soy sauce, bouillon cubes, malt vinegar, many spice blends</li><li><strong>Cross-contamination</strong> - shared cooking surfaces, fryer oil, restaurant kitchens</li></ul><h3>In this combined protocol</h3><p>Because GAPS already excludes all grains, the combined protocol is automatically gluten-free. The GF label helps catch hidden gluten in processed products and seasonings. Use the Scanner tab to check any unfamiliar product.</p><h3>Research</h3><p>A 2022 systematic review in <em>Nutrients</em> confirmed that a strict gluten-free diet leads to significant improvements in intestinal permeability, symptom burden and quality of life in children with celiac disease and gluten sensitivity.</p><p class='cite'>Vici et al., Nutrients (2022); Catassi et al., Nutrients (2017)</p>"},
@@ -977,13 +428,12 @@ var RES = [
 ];
 
 // ── STORAGE ──────────────────────────────────────────────
-function save(){try{localStorage.setItem('rdg_fav',JSON.stringify(favorites));localStorage.setItem('rdg_lst',JSON.stringify(shopList));localStorage.setItem('rdg_rx',JSON.stringify(reactions));}catch(e){}}
-function load(){try{var f=localStorage.getItem('rdg_fav'),l=localStorage.getItem('rdg_lst'),r=localStorage.getItem('rdg_rx');if(f)favorites=JSON.parse(f);if(l)shopList=JSON.parse(l);if(r)reactions=JSON.parse(r);}catch(e){}}
+function save(){try{localStorage.setItem('rdg_fav',JSON.stringify(favorites));localStorage.setItem('rdg_lst',JSON.stringify(shopList));localStorage.setItem('rdg_rx',JSON.stringify(reactions));localStorage.setItem('rdg_gen',JSON.stringify(generatedRecipes));}catch(e){}}
+function load(){try{var f=localStorage.getItem('rdg_fav'),l=localStorage.getItem('rdg_lst'),r=localStorage.getItem('rdg_rx'),g=localStorage.getItem('rdg_gen');if(f)favorites=JSON.parse(f);if(l)shopList=JSON.parse(l);if(r)reactions=JSON.parse(r);if(g)generatedRecipes=JSON.parse(g);}catch(e){}}
 
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
 
 var chev='<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
-function esc(s){return String(s).replace(/'/g,'&#39;');}
 
 // ── NAV ──────────────────────────────────────────────────
 function goTab(page,btn){
@@ -996,6 +446,7 @@ function goTab(page,btn){
  if(page==='list')renderList();
  if(page==='rx')renderRx();
  if(page==='res')renderRes();
+ if(page==='builder'){curMealTypeChoice='';document.querySelectorAll('#mealTypeBtns .svb').forEach(function(b){b.classList.remove('on');});}
 }
 
 // ── FOODS ────────────────────────────────────────────────
@@ -1049,11 +500,11 @@ function renderFoods(){
     var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';
     tags+='<span class="dt '+tc+'">'+k.toUpperCase()+':'+vi+'</span>';
    });
-   var sbg=f.sh?'<button class="sbx sbg" onclick="event.stopPropagation();addFoodToList(&#39;'+esc(f.n)+'&#39;,&#39;'+f.sh+'&#39;)">+List</button>':'';
-   var sbl='<button class="sbx sbr" onclick="event.stopPropagation();prefillRx(&#39;'+esc(f.n)+'&#39;)">Log</button>';
-   html+='<div class="fc'+(openFood===f.n?' open':'')+'" onclick="toggleFood(&#39;'+esc(f.n)+'&#39;)">'+
+   var sbg=f.sh?'<button class="sbx sbg" onclick="event.stopPropagation();addFoodToList(''+f.n.replace(/'/g,"\'")+'',''+f.sh+'')">+List</button>':'';
+   var sbl='<button class="sbx sbr" onclick="event.stopPropagation();prefillRx(''+f.n.replace(/'/g,"\'")+'')">Log</button>';
+   html+='<div class="fc'+(openFood===f.n?' open':'')+'" onclick="toggleFood(''+f.n.replace(/'/g,"\'")+'')">'+
     '<div class="fch"><div class="fci"><div class="fcn">'+f.n+'</div><div class="fcc">'+f.c+'</div></div>'+
-    '<div class="fca">'+sbg+sbl+'<button class="hb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favFood(&#39;'+esc(f.n)+'&#39;,this)">&#9829;</button>'+
+    '<div class="fca">'+sbg+sbl+'<button class="hb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favFood(''+f.n.replace(/'/g,"\'")+'',this)">&#9829;</button>'+
     '<span class="bdg '+bc+'">'+ic+'</span></div></div>'+
     '<div class="dtags">'+tags+'</div>'+
     '<div class="fcb">'+(f.p?'<div class="dl">How to prepare</div><div class="dtt dtp">'+f.p+'</div>':'')+
@@ -1101,7 +552,7 @@ function renderMeals(){
   html+='<div class="mc'+(openMeal===idx?' open':'')+'">'+
    '<div class="mch" onclick="toggleMeal('+idx+')">'+
    '<div><div class="mct">'+m.n+'</div><div class="mcm">'+m.t+'</div></div>'+
-   '<div class="mcr"><button class="mfb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favMeal(&#39;'+esc(m.n)+'&#39;,this)">&#9829;</button>'+chev+'</div></div>'+
+   '<div class="mcr"><button class="mfb'+(isFav?' fvd':'')+'" onclick="event.stopPropagation();favMeal(''+m.n.replace(/'/g,"\'")+'',this)">&#9829;</button>'+chev+'</div></div>'+
    '<div class="mcb"><p style="font-size:13px;color:var(--t2);margin-bottom:10px;line-height:1.5">'+m.d+'</p>'+
    '<div class="ms"><h4>Ingredients</h4><ul>'+ingr+'</ul></div>'+
    '<div class="ms"><h4>Steps</h4><ol>'+steps+'</ol></div>'+
@@ -1138,7 +589,7 @@ function renderFavs(){
  var grid=document.getElementById('favsGrid');
  var fF=FOODS.filter(function(f){return favorites.foods.indexOf(f.n)>-1;});
  var fM=MEALS.filter(function(m){return favorites.meals.indexOf(m.n)>-1;});
- if(!fF.length&&!fM.length){grid.innerHTML='<div class="empty" style="padding:44px 20px"><div style="font-size:40px;margin-bottom:12px">&#9829;</div><p>Nothing saved yet.</p><p style="margin-top:6px;font-size:13px;color:var(--t3)">Tap the heart on any food or recipe to save it here.</p></div>';return;}
+ if(!fF.length&&!fM.length&&!generatedRecipes.length){grid.innerHTML='<div class="empty" style="padding:44px 20px"><div style="font-size:40px;margin-bottom:12px">&#9829;</div><p>Nothing saved yet.</p><p style="margin-top:6px;font-size:13px;color:var(--t3)">Tap the heart on any food or recipe to save it here. Use the Recipe Builder tab to create and save custom recipes.</p></div>';return;}
  var html='';
  if(fF.length){
   html+='<div class="sh">Saved foods</div>';
@@ -1147,7 +598,7 @@ function renderFavs(){
    var tags='';
    ['gf','ls','lh','g'].forEach(function(k){var v=f.d[k];var tc=v==='ok'?'dtok':v==='no'?'dtno':'dtca';var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';tags+='<span class="dt '+tc+'">'+k.toUpperCase()+':'+vi+'</span>';});
    html+='<div class="fc"><div class="fch"><div class="fci"><div class="fcn">'+f.n+'</div><div class="fcc">'+f.c+'</div></div>'+
-    '<div class="fca"><button onclick="remFavFood(&#39;'+esc(f.n)+'&#39;)" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer">Remove</button>'+
+    '<div class="fca"><button onclick="remFavFood(''+f.n.replace(/'/g,"\'")+'')" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer">Remove</button>'+
     '<span class="bdg '+bc+'">'+(f.s==='allowed'?'&#10003;':f.s==='avoid'?'&#10007;':'~')+'</span></div></div>'+
     '<div class="dtags">'+tags+'</div>'+
     (f.p?'<div style="padding:0 13px 12px"><div class="dl">Prepare</div><div class="dtt dtp">'+f.p+'</div></div>':'')+
@@ -1159,19 +610,51 @@ function renderFavs(){
   fM.forEach(function(m){
    var ingr='';m.i.forEach(function(x){ingr+='<li>'+x+'</li>';});
    var steps='';m.s.forEach(function(x){steps+='<li>'+x+'</li>';});
-   html+='<div class="mc"><div class="mch" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">'+
+   html+='<div class="mc"><div class="mch" onclick="this.parentElement.classList.toggle('open')">'+
     '<div><div class="mct">'+m.n+'</div><div class="mcm">'+m.tab.charAt(0).toUpperCase()+m.tab.slice(1)+' &middot; '+m.t+'</div></div>'+
-    '<div class="mcr"><button onclick="event.stopPropagation();remFavMeal(&#39;'+esc(m.n)+'&#39;)" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer;margin-right:6px">Remove</button>'+chev+'</div></div>'+
+    '<div class="mcr"><button onclick="event.stopPropagation();remFavMeal(''+m.n.replace(/'/g,"\'")+'')" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer;margin-right:6px">Remove</button>'+chev+'</div></div>'+
     '<div class="mcb"><div class="ms"><h4>Ingredients</h4><ul>'+ingr+'</ul></div>'+
     '<div class="ms"><h4>Steps</h4><ol>'+steps+'</ol></div>'+
     (m.nt?'<div class="nbox"><h4>Important note</h4><p>'+m.nt+'</p></div>':'')+
     '</div></div>';
   });
  }
+ if(generatedRecipes.length){
+  html+='<div class="sh">&#11088; AI Generated Recipes</div>';
+  generatedRecipes.forEach(function(gr){
+   var r=gr.recipe;
+   var ingr='';r.ingredients.forEach(function(x){ingr+='<li>'+x+'</li>';});
+   var steps='';r.steps.forEach(function(x){steps+='<li style="margin-bottom:5px">'+x+'</li>';});
+   html+='<div class="mc"><div class="mch" onclick="this.parentElement.classList.toggle(\'open\')">'+
+    '<div><div class="mct">'+r.recipeName+'</div><div class="mcm">'+r.mealType+' &middot; '+r.cookTime+'</div></div>'+
+    '<div class="mcr">'+chev+'</div></div>'+
+    '<div class="mcb">'+
+    '<p style="font-size:13px;color:var(--t2);margin-bottom:10px;line-height:1.5">'+r.description+'</p>'+
+    '<div class="ms"><h4>Ingredients</h4><ul>'+ingr+'</ul></div>'+
+    '<div class="ms"><h4>Steps</h4><ol>'+steps+'</ol></div>'+
+    '<div style="background:var(--gl);border-radius:8px;padding:8px 10px;margin-top:10px;font-size:13px;color:var(--gd)">'+r.complianceNote+'</div>'+
+    '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+
+    '<button onclick="addGenToListFromFavs('+gr.id+')" style="font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid var(--g);background:var(--gl);color:var(--gd);cursor:pointer;font-weight:600">+ Add to shopping list</button>'+
+    '<button onclick="remGenRecipe('+gr.id+')" style="font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer">Remove</button>'+
+    '</div></div></div>';
+  });
+ }
  grid.innerHTML=html;
 }
 function remFavFood(n){favorites.foods=favorites.foods.filter(function(x){return x!==n;});save();renderFavs();toast('Removed');}
 function remFavMeal(n){favorites.meals=favorites.meals.filter(function(x){return x!==n;});save();renderFavs();toast('Removed');}
+function remGenRecipe(id){generatedRecipes=generatedRecipes.filter(function(r){return r.id!==id;});save();renderFavs();toast('Removed');}
+function addGenToListFromFavs(id){
+ var rec=null;generatedRecipes.forEach(function(r){if(r.id===id)rec=r;});
+ if(!rec||!rec.recipe.shoppingList)return;
+ var added=0;
+ rec.recipe.shoppingList.forEach(function(item){
+  var found=false;shopList.forEach(function(i){if(i.n.toLowerCase()===item.toLowerCase())found=true;});
+  if(!found){shopList.push({id:Date.now()+Math.random(),n:item,cat:'Produce',done:false});added++;}
+ });
+ save();updateListBadge();
+ toast(added>0?added+' item'+(added>1?'s':'')+' added to list':'All items already on list');
+}
 
 // ── SHOPPING LIST ────────────────────────────────────────
 function buildListCats(){
@@ -1297,7 +780,7 @@ function renderRes(){
  var html='';
  RES.forEach(function(r,i){
   html+='<div class="rsec'+(i===0?' open':'')+'">'+
-   '<div class="rshd" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">'+
+   '<div class="rshd" onclick="this.parentElement.classList.toggle('open')">'+
    '<span class="rsi">'+r.icon+'</span>'+
    '<div class="rstw"><div class="rst">'+r.title+'</div><div class="rss">'+r.sub+'</div></div>'+
    chev+'</div>'+
@@ -1306,9 +789,92 @@ function renderRes(){
  el.innerHTML=html;
 }
 
-function loadApiKey(){try{var k=localStorage.getItem('rdg_key');if(k)apiKey=k;}catch(e){}}
-function saveApiKey(){var v=document.getElementById('apiKeyInput').value.trim();if(!v){toast('Enter a key first');return;}apiKey=v;try{localStorage.setItem('rdg_key',v);}catch(e){}document.getElementById('apiKeyInput').value='';updateKeyStatus();toast('API key saved on this device');}
-function updateKeyStatus(){var el=document.getElementById('keyStatus');if(!el)return;if(apiKey){el.innerHTML='<span style="color:var(--gd)">&#10003; Key saved (ends '+apiKey.slice(-4)+')</span>';}else{el.innerHTML='<span style="color:var(--rd)">No key saved yet &mdash; scanning will not work until you add one.</span>';}}
+// ── RECIPE BUILDER ───────────────────────────────────────
+var curMealTypeChoice = '';
+var BUILDER_PROMPT = 'You are a recipe creator for a family whose 4-year-old daughter follows a strict combined diet. ALL recipes must comply with ALL FOUR of these rules simultaneously: (1) GLUTEN-FREE: absolutely no wheat, barley, rye, or oats in any form; (2) EXTREMELY LOW SUGAR: no added sugars, no syrups, no juice, only tiny raw honey allowed and only for children over 2; (3) LOW HISTAMINE: no aged, fermented, canned, or smoked foods, no tomatoes, no citrus, no strawberries, no avocado, no eggplant, no vinegar, no soy sauce, no long-cooked broth - use only short-cook broth under 3 hours; (4) GAPS DIET: no grains at all including rice and corn, no starchy vegetables like potatoes, no legumes including beans and lentils, no processed foods - allowed foods are fresh meats, eggs, non-starchy vegetables, nuts, coconut products, ghee, and tiny raw honey. CRITICAL FRESHNESS RULE: always instruct the user to cook meat fresh and eat immediately, as histamine rises rapidly in stored cooked meat. The child is 4 years old so recipes should use soft textures and mild flavors that appeal to children and adults alike. Respond ONLY in this exact JSON with no markdown and no preamble: {"recipeName":"string","mealType":"string","cookTime":"string","servings":"string","description":"string","ingredients":["array of ingredient strings with amounts"],"steps":["array of step strings"],"complianceNote":"one sentence explaining why this recipe is safe","kidFriendlyTip":"one tip for making this appealing to a 4 year old","shoppingList":["array of just the ingredient names without amounts for shopping"]}';
+
+function setMealType(type, btn) {
+ curMealTypeChoice = type;
+ document.querySelectorAll('#mealTypeBtns .svb').forEach(function(b){b.classList.remove('on');});
+ btn.classList.add('on');
+}
+
+async function buildRecipe() {
+ if(!curMealTypeChoice){toast('Please select a meal type first');return;}
+ var ingredients = document.getElementById('builder-ingredients').value.trim();
+ if(!ingredients){toast('Please enter some ingredients');return;}
+ var notes = document.getElementById('builder-notes').value.trim();
+ var btn = document.getElementById('builderbtn');
+ var resEl = document.getElementById('builderResult');
+ btn.disabled = true;
+ btn.innerHTML = '<span class="spinner"></span> Building your recipe...';
+ resEl.innerHTML = '<div style="text-align:center;padding:24px;font-size:14px;color:var(--t2)">Creating a ' + curMealTypeChoice.toLowerCase() + ' recipe just for your family...</div>';
+ var prompt = 'Create a ' + curMealTypeChoice + ' recipe using some or all of these available ingredients: ' + ingredients + '.' + (notes ? ' Special requests: ' + notes + '.' : '') + ' Only use ingredients from the list that comply with all four diet rules. You may suggest adding basic compliant pantry staples like sea salt, ghee, or water if needed.';
+ try {
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+   method: 'POST',
+   headers: {'Content-Type':'application/json'},
+   body: JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1500, system:BUILDER_PROMPT, messages:[{role:'user',content:prompt}]})
+  });
+  var data = await resp.json();
+  var rawText = data.content && data.content.find(function(b){return b.type==='text';});
+  rawText = rawText ? rawText.text : '';
+  var recipe = JSON.parse(rawText.replace(/```json|```/g,'').trim());
+  var ingr = '';
+  recipe.ingredients.forEach(function(x){ingr += '<li>' + x + '</li>';});
+  var steps = '';
+  recipe.steps.forEach(function(x){steps += '<li style="margin-bottom:6px">' + x + '</li>';});
+  var genId = Date.now();
+  resEl.innerHTML = '<div class="gen-card">' +
+   '<div class="gen-title">' + recipe.recipeName + '</div>' +
+   '<div class="gen-meta">' + recipe.mealType + ' &nbsp;&middot;&nbsp; ' + recipe.cookTime + ' &nbsp;&middot;&nbsp; ' + recipe.servings + '</div>' +
+   '<p style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:12px">' + recipe.description + '</p>' +
+   '<div class="ms"><h4>Ingredients</h4><ul>' + ingr + '</ul></div>' +
+   '<div class="ms"><h4>Steps</h4><ol>' + steps + '</ol></div>' +
+   '<div style="background:var(--gl);border-radius:8px;padding:9px 11px;margin-top:12px">' +
+   '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gd);margin-bottom:3px">Diet compliance</div>' +
+   '<div style="font-size:13px;color:var(--gd);line-height:1.5">' + recipe.complianceNote + '</div></div>' +
+   '<div style="background:var(--al);border-radius:8px;padding:9px 11px;margin-top:8px">' +
+   '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ad);margin-bottom:3px">Kid-friendly tip</div>' +
+   '<div style="font-size:13px;color:var(--ad);line-height:1.5">' + recipe.kidFriendlyTip + '</div></div>' +
+   '<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:0">' +
+   '<button class="gen-save" id="savebtn-' + genId + '" onclick="saveGeneratedRecipe(' + genId + ',this)">&#11088; Save this recipe</button>' +
+   '<button class="gen-addlist" onclick="addGeneratedToList(' + genId + ',this)">+ Add to shopping list</button>' +
+   '</div></div>';
+  window['genRecipe_' + genId] = recipe;
+ } catch(err) {
+  resEl.innerHTML = '<div class="rbox rca"><div class="rtitle">Could not build recipe</div><div class="rbody">Check your network and try again.<br><small style="color:var(--t3)">' + err.message + '</small></div></div>';
+ }
+ btn.disabled = false;
+ btn.innerHTML = '&#127859; Build My Recipe';
+}
+
+function saveGeneratedRecipe(genId, btn) {
+ var recipe = window['genRecipe_' + genId];
+ if(!recipe)return;
+ var already = false;
+ generatedRecipes.forEach(function(r){if(r.id===genId)already=true;});
+ if(already){toast('Already saved');return;}
+ generatedRecipes.unshift({id:genId, recipe:recipe});
+ save();
+ btn.classList.add('saved');
+ btn.textContent = '&#11088; Saved!';
+ toast('Recipe saved to Saved tab');
+}
+
+function addGeneratedToList(genId, btn) {
+ var recipe = window['genRecipe_' + genId];
+ if(!recipe||!recipe.shoppingList)return;
+ var added = 0;
+ recipe.shoppingList.forEach(function(item){
+  var found = false;
+  shopList.forEach(function(i){if(i.n.toLowerCase()===item.toLowerCase())found=true;});
+  if(!found){shopList.push({id:Date.now()+Math.random(),n:item,cat:'Produce',done:false});added++;}
+ });
+ save();updateListBadge();
+ if(added>0){btn.textContent='Added ' + added + ' items';toast(added + ' item' + (added>1?'s':'') + ' added to list');}
+ else toast('All items already on list');
+}
 
 // ── SCANNER ──────────────────────────────────────────────
 document.getElementById('photoInput').addEventListener('change',function(e){
@@ -1320,31 +886,26 @@ document.getElementById('photoInput').addEventListener('change',function(e){
   photoB64=ev.target.result.split(',')[1];
   document.getElementById('pinput').value='';
   document.getElementById('scanResult').innerHTML='';
-  document.getElementById('clearPhotoBtn').style.display='block';
  };
  reader.readAsDataURL(file);
 });
 document.getElementById('pinput').addEventListener('keydown',function(e){if(e.key==='Enter')doScan();});
-document.getElementById('pinput').addEventListener('input',function(){if(photoB64)clearPhoto();});
-function clearPhoto(){photoB64=null;var pv=document.getElementById('pphoto');pv.src='';pv.style.display='none';document.getElementById('clearPhotoBtn').style.display='none';document.getElementById('photoInput').value='';document.getElementById('scanResult').innerHTML='';toast('Photo cleared');}
 
 var SYSPROMPT='You are a dietary expert helping parents of a 4-year-old girl on a strict combined diet: 1. GLUTEN-FREE: no wheat, barley, rye, regular oats 2. EXTREMELY LOW SUGAR: no added sugars, minimal natural sugars, no syrups, no juice 3. LOW HISTAMINE: avoid aged/fermented/canned foods, tomatoes, citrus, strawberries, avocado, vinegar, alcohol, long-cooked broth 4. GAPS DIET: no grains (including rice, corn, oats), no starchy vegetables (potatoes), no legumes, no processed foods. Allowed: fresh meats, eggs, non-starchy vegetables, nuts/seeds, raw honey in tiny amounts. Respond ONLY in this exact JSON (no markdown): {"verdict":"allowed|caution|avoid","productName":"string","summary":"one sentence","dietBreakdown":{"glutenFree":{"status":"ok|caution|no","reason":"brief"},"lowSugar":{"status":"ok|caution|no","reason":"brief"},"lowHistamine":{"status":"ok|caution|no","reason":"brief"},"gaps":{"status":"ok|caution|no","reason":"brief"}},"keyIssues":["array"],"saferAlternative":"string or null"}';
 
-window.doScan = doScan; async function doScan(){
+async function doScan(){
  var btn=document.getElementById('scanbtn');
  var resEl=document.getElementById('scanResult');
  var txt=document.getElementById('pinput').value.trim();
  if(!photoB64&&!txt){resEl.innerHTML='<div class="rbox rca"><div class="rtitle">Nothing to analyze</div><div class="rbody">Please take a photo or type a product name.</div></div>';return;}
- if(!apiKey){resEl.innerHTML='<div class="rbox rca"><div class="rtitle">No API key set</div><div class="rbody">Add your Anthropic API key in the box near the top of this tab, then try again.</div></div>';return;}
  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyzing...';
  resEl.innerHTML='<div style="text-align:center;padding:20px;font-size:14px;color:var(--t2)">Checking against all four diet rules...</div>';
  try{
   var messages;
   if(photoB64)messages=[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:photoB64}},{type:"text",text:"Analyze this product label for the diet described."}]}];
   else messages=[{role:"user",content:'Analyze this product: "'+txt+'"'}];
-  var resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1000,system:SYSPROMPT,messages:messages})});
+  var resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:SYSPROMPT,messages:messages})});
   var data=await resp.json();
-  if(!resp.ok){throw new Error((data&&data.error&&data.error.message)||('Request failed: HTTP '+resp.status));}
   var rawText=data.content&&data.content.find(function(b){return b.type==='text';});
   rawText=rawText?rawText.text:'';
   var result=JSON.parse(rawText.replace(/```json|```/g,'').trim());
@@ -1364,8 +925,6 @@ window.doScan = doScan; async function doScan(){
 
 // ── INIT ────────────────────────────────────────────────
 load();
-loadApiKey();
-updateKeyStatus();
 buildCatPills();
 buildListCats();
 renderFoods();
@@ -1378,13 +937,6 @@ document.getElementById('fsrch').addEventListener('input',renderFoods);
 
 } catch(err) {
   document.body.innerHTML = '<div style="padding:20px;font-family:sans-serif"><h2 style="color:red">Error found:</h2><p style="margin-top:10px;font-size:14px;background:#fee;padding:12px;border-radius:8px">' + err.message + '<br><br>Line: ' + (err.lineNumber || err.line || 'unknown') + '</p></div>';
-}
-</script>
-<script>
-if('serviceWorker' in navigator){
- window.addEventListener('load', function(){
-  navigator.serviceWorker.register('./sw.js').catch(function(e){});
- });
 }
 </script>
 </body>
