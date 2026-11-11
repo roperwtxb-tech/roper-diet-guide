@@ -340,7 +340,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
   </div>
   <div class="frow" style="margin-top:4px">
    <label class="flbl">Anything on hand to use? (optional)</label>
-   <input class="finp" id="ideaOnHand" type="text" placeholder="e.g. pears, coconut yogurt, almond butter..."/>
+   <input class="finp" id="ideaOnHand" type="text" placeholder="e.g. pears, cucumbers, almond butter..."/>
   </div>
   <button class="btn" id="ideasbtn" onclick="getFreshIdeas(false)" style="margin-top:8px">&#10024; Give Me Fresh Ideas</button>
  </div>
@@ -374,11 +374,11 @@ var FOODS = [
  {n:"Beef (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Fresh cuts only. Buy same day or freeze immediately.",t:"Grass-fed preferred.",sh:"Meat & Seafood"},
  {n:"Lamb (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Fresh cuts. Excellent slow-cooked.",t:"Often very well tolerated. Naturally low histamine.",sh:"Meat & Seafood"},
  {n:"Turkey (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast or bake fresh. Avoid pre-basted birds.",t:"Good variety protein.",sh:"Meat & Seafood"},
- {n:"Pork (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Fresh only. Plain roast or chops. Never cured or smoked.",t:"Slightly higher histamine than lamb or beef.",sh:"Meat & Seafood"},
- {n:"Eggs (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Scrambled low-slow in ghee, soft boiled, or poached. Introduce yolks first on GAPS intro.",t:"Watch for egg white sensitivity.",sh:"Dairy & Eggs"},
- {n:"Wild-caught fish (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Very fresh only, cook same day. Never canned, smoked or dried.",t:"Histamine rises extremely fast in fish.",sh:"Meat & Seafood"},
+ {n:"Pork (fresh)",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Fresh only. Plain roast or chops. Never cured or smoked.",t:"Slightly higher histamine than lamb or beef.",sh:"Meat & Seafood"},
+ {n:"Eggs (fresh)",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Our family avoids eggs in all forms, including whites, yolks, and eggs baked into foods.",t:"Egg whites are a common histamine liberator.",sh:"Dairy & Eggs"},
+ {n:"Wild-caught fish (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Very fresh only, cook same day. Never canned, smoked or dried.",t:"Histamine rises extremely fast in fish.",sh:"Meat & Seafood"},
  {n:"Canned fish / deli meats",c:"Proteins",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid entirely.",t:"High histamine, often gluten-containing, nitrates and added sugars.",sh:""},
- {n:"Bone broth (short-cook)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Simmer fresh bones under 3 hours. Use as cooking liquid or warm drink.",t:"Short-cook keeps histamine lower. Long-simmered broth raises histamine significantly.",sh:"Meat & Seafood"},
+ {n:"Bone broth (short-cook)",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Simmer fresh bones under 3 hours. Use as cooking liquid or warm drink.",t:"Short-cook keeps histamine lower. Long-simmered broth raises histamine significantly.",sh:"Meat & Seafood"},
  {n:"Butternut squash",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast or steam. Puree for small children.",t:"Gentle and nutrient-dense. One of the best tolerated foods.",sh:"Produce"},
  {n:"Zucchini",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam, saute in ghee, or add to soups.",t:"GAPS intro staple. Low histamine.",sh:"Produce"},
  {n:"Carrots",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Boil or steam until very soft. Puree well.",t:"One of the best GAPS intro vegetables.",sh:"Produce"},
@@ -389,29 +389,29 @@ var FOODS = [
  {n:"Cucumber",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Peeled and sliced fresh.",t:"Low histamine. Good texture for children.",sh:"Produce"},
  {n:"Asparagus",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam or roast with ghee and sea salt.",t:"GAPS-friendly.",sh:"Produce"},
  {n:"Green beans",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam or boil until tender. Toss with ghee.",t:"Low histamine. Well tolerated.",sh:"Produce"},
- {n:"Spinach",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Small amounts of freshly cooked only. Never wilted or leftover.",t:"Moderate histamine.",sh:"Produce"},
+ {n:"Spinach",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Small amounts of freshly cooked only. Never wilted or leftover.",t:"Moderate histamine.",sh:"Produce"},
  {n:"Tomatoes",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"caution",lh:"no",g:"caution"},p:"Avoid in all forms.",t:"High histamine trigger.",sh:""},
  {n:"Avocado",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"ok"},p:"Avoid despite nutrition.",t:"High histamine.",sh:""},
  {n:"Eggplant",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"ok"},p:"Avoid.",t:"Very high histamine.",sh:""},
- {n:"Sweet potato",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"Not GAPS intro. Small amounts in full GAPS only.",t:"Excluded from GAPS intro. Moderate sugar.",sh:"Produce"},
+ {n:"Sweet potato",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"Not GAPS intro. Small amounts in full GAPS only.",t:"Excluded from GAPS intro. Moderate sugar.",sh:"Produce"},
  {n:"Blueberries",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh only. Small amounts as occasional treat.",t:"Lower sugar fruit. After GAPS intro.",sh:"Produce"},
  {n:"Pears",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Ripe, peeled, small portions or lightly stewed.",t:"Gentle and usually well tolerated.",sh:"Produce"},
  {n:"Apples (cooked)",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Stew or bake without sugar.",t:"Unsweetened stewed apple is a GAPS option.",sh:"Produce"},
- {n:"Bananas",c:"Fruits",s:"caution",d:{gf:"ok",ls:"caution",lh:"caution",g:"ok"},p:"Slightly underripe, very small amounts.",t:"Moderate histamine and high sugar.",sh:"Produce"},
+ {n:"Bananas",c:"Fruits",s:"avoid",d:{gf:"ok",ls:"caution",lh:"caution",g:"ok"},p:"Slightly underripe, very small amounts.",t:"Moderate histamine and high sugar.",sh:"Produce"},
  {n:"Strawberries",c:"Fruits",s:"avoid",d:{gf:"ok",ls:"caution",lh:"no",g:"ok"},p:"Avoid.",t:"High histamine and histamine liberator.",sh:""},
  {n:"Citrus fruits",c:"Fruits",s:"avoid",d:{gf:"ok",ls:"caution",lh:"no",g:"ok"},p:"Avoid all.",t:"Strong histamine liberators.",sh:""},
  {n:"Ghee (clarified butter)",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Primary cooking fat. Make at home or buy grass-fed quality.",t:"Casein-free, lactose-free. Cornerstone GAPS fat.",sh:"Dairy & Eggs"},
  {n:"Coconut oil (unrefined)",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Good for cooking and baking. Virgin/unrefined.",t:"Antimicrobial. Great GAPS fat.",sh:"Oils & Condiments"},
  {n:"Olive oil (extra virgin)",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Cold use or very low heat only.",t:"Do not cook at high temperature.",sh:"Oils & Condiments"},
- {n:"Coconut milk (full-fat)",c:"Fats & Oils",s:"caution",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Label must say only coconut and water. No guar gum ideally.",t:"Check label every time.",sh:"Baking"},
+ {n:"Coconut milk (full-fat)",c:"Fats & Oils",s:"avoid",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Label must say only coconut and water. No guar gum ideally.",t:"Check label every time.",sh:"Baking"},
  {n:"Vegetable / seed oils",c:"Fats & Oils",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"no"},p:"Avoid canola, sunflower, soy, corn oil.",t:"Not GAPS-approved.",sh:""},
- {n:"GAPS yogurt (24hr homemade)",c:"Dairy",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Ferment full-fat milk 24 hours. Start with 1 tsp and build slowly.",t:"Core GAPS food but fermentation raises histamine. Introduce very slowly.",sh:"Dairy & Eggs"},
- {n:"Fresh butter (unsalted)",c:"Dairy",s:"caution",d:{gf:"ok",ls:"ok",lh:"ok",g:"caution"},p:"Unsalted, grass-fed. Some prefer to start with ghee only.",t:"Introduces casein, watch for dairy sensitivity.",sh:"Dairy & Eggs"},
+ {n:"GAPS yogurt (24hr homemade)",c:"Dairy",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Ferment full-fat milk 24 hours. Start with 1 tsp and build slowly.",t:"Core GAPS food but fermentation raises histamine. Introduce very slowly.",sh:"Dairy & Eggs"},
+ {n:"Fresh butter (unsalted)",c:"Dairy",s:"avoid",d:{gf:"ok",ls:"ok",lh:"ok",g:"caution"},p:"Unsalted, grass-fed. Some prefer to start with ghee only.",t:"Introduces casein, watch for dairy sensitivity.",sh:"Dairy & Eggs"},
  {n:"Aged cheeses",c:"Dairy",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"caution"},p:"Avoid all aged cheeses.",t:"Very high histamine.",sh:""},
  {n:"Store-bought yogurt",c:"Dairy",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid. Must be homemade for GAPS.",t:"Added sugars, insufficient fermentation.",sh:""},
  {n:"Almond flour (blanched)",c:"Baking",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Key GAPS baking flour. Blanched preferred.",t:"Grain-free, gluten-free GAPS staple.",sh:"Baking"},
  {n:"Coconut flour",c:"Baking",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Very absorbent, use far less. Best combined with almond flour.",t:"GAPS approved. High fiber.",sh:"Baking"},
- {n:"Raw honey",c:"Baking",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Tiny amounts only. Never heat. Not for children under 2.",t:"Allowed in GAPS in very small amounts.",sh:"Baking"},
+ {n:"Raw honey",c:"Baking",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Tiny amounts only. Never heat. Not for children under 2.",t:"Allowed in GAPS in very small amounts.",sh:"Baking"},
  {n:"Wheat / gluten flours",c:"Baking",s:"avoid",d:{gf:"no",ls:"ok",lh:"ok",g:"no"},p:"Avoid entirely.",t:"Excluded by GAPS and gluten-free requirement.",sh:""},
  {n:"Rice / oats (even GF)",c:"Baking",s:"avoid",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"GAPS excludes all grains.",t:"All grains excluded on GAPS.",sh:""},
  {n:"Refined sugars / syrups",c:"Baking",s:"avoid",d:{gf:"ok",ls:"no",lh:"ok",g:"no"},p:"Avoid all. Sugar, maple syrup, agave, corn syrup.",t:"Excluded from GAPS and low sugar diet.",sh:""},
@@ -845,6 +845,18 @@ function renderRes(){
  el.innerHTML=html;
 }
 
+
+// ── FAMILY RULES (generated from the Foods tab) ─────────
+// The AI tools follow whatever the Foods tab says. Change a food's status there
+// and the Scanner, Recipe Builder and Fresh Ideas all follow along.
+function familyRules(){
+ var avoid=[],caution=[],ok=[];
+ FOODS.forEach(function(f){if(f.s==='avoid')avoid.push(f.n);else if(f.s==='caution')caution.push(f.n);else ok.push(f.n);});
+ return ' FAMILY FOOD LIST (this overrides any general rule above when they disagree): NEVER use or suggest these, not even in small amounts or as a minor ingredient: '+avoid.join('; ')+'.'+
+  ' EGGS ARE NOT ALLOWED IN ANY FORM: no whole eggs, egg whites, or egg yolks, including as a binder or in baked goods, and no egg-based products like mayonnaise.'+
+  (caution.length?' Use these only in tiny amounts and never as the main ingredient: '+caution.join('; ')+'.':'')+
+  ' These ARE allowed for this child even if a general rule above says otherwise: '+ok.join('; ')+'.';
+}
 // ── RECIPE BUILDER ───────────────────────────────────────
 var curMealTypeChoice = '';
 var BUILDER_PROMPT = 'You are a recipe creator for a family whose 4-year-old daughter follows a strict combined diet. ALL recipes must comply with ALL FOUR of these rules simultaneously: (1) GLUTEN-FREE: absolutely no wheat, barley, rye, or oats in any form; (2) EXTREMELY LOW SUGAR: no added sugars, no syrups, no juice, only tiny raw honey allowed and only for children over 2; (3) LOW HISTAMINE: no aged, fermented, canned, or smoked foods, no tomatoes, no citrus, no strawberries, no avocado, no eggplant, no vinegar, no soy sauce, no long-cooked broth - use only short-cook broth under 3 hours; (4) GAPS DIET: no grains at all including rice and corn, no starchy vegetables like potatoes, no legumes including beans and lentils, no processed foods - allowed foods are fresh meats, eggs, non-starchy vegetables, nuts, coconut products, ghee, and tiny raw honey. CRITICAL FRESHNESS RULE: always instruct the user to cook meat fresh and eat immediately, as histamine rises rapidly in stored cooked meat. The child is 4 years old so recipes should use soft textures and mild flavors that appeal to children and adults alike. Respond ONLY in this exact JSON with no markdown and no preamble: {"recipeName":"string","mealType":"string","cookTime":"string","servings":"string","description":"string","ingredients":["array of ingredient strings with amounts"],"steps":["array of step strings"],"complianceNote":"one sentence explaining why this recipe is safe","kidFriendlyTip":"one tip for making this appealing to a 4 year old","shoppingList":["array of just the ingredient names without amounts for shopping"]}';
@@ -870,7 +882,7 @@ window.buildRecipe = async function() {
   var resp = await fetch(API_PROXY_URL, {
    method: 'POST',
    headers: {'Content-Type':'application/json'},
-   body: JSON.stringify({model:'claude-sonnet-5', max_tokens:1500, system:BUILDER_PROMPT, messages:[{role:'user',content:prompt}]})
+   body: JSON.stringify({model:'claude-sonnet-5', max_tokens:1500, system:BUILDER_PROMPT+familyRules(), messages:[{role:'user',content:prompt}]})
   });
   var data = await resp.json();
   if(data.error){throw new Error(data.error.message || 'The recipe service returned an error.');}
@@ -961,7 +973,7 @@ window.doScan = async function(){
   var messages;
   if(photoB64)messages=[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:photoB64}},{type:"text",text:"Analyze this product label for the diet described."}]}];
   else messages=[{role:"user",content:'Analyze this product: "'+txt+'"'}];
-  var resp=await fetch(API_PROXY_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1000,system:SYSPROMPT,messages:messages})});
+  var resp=await fetch(API_PROXY_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1000,system:SYSPROMPT+familyRules(),messages:messages})});
   var data=await resp.json();
   if(data.error){throw new Error(data.error.message || 'The scanner service returned an error.');}
   var rawText=data.content&&data.content.find(function(b){return b.type==='text';});
@@ -1039,7 +1051,7 @@ window.getFreshIdeas = async function(more){
  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Thinking up ideas...';
  if(!more)resEl.innerHTML='<div style="text-align:center;padding:24px;font-size:14px;color:var(--t2)">Raiding the idea pantry...</div>';
  try{
-  var resp=await fetch(API_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:2500,system:IDEAS_PROMPT+(ideaType==='Shop'?SHOP_RULES:(ideaSimple?SIMPLE_RULES:'')),messages:[{role:'user',content:prompt}]})});
+  var resp=await fetch(API_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:2500,system:IDEAS_PROMPT+familyRules()+(ideaType==='Shop'?SHOP_RULES:(ideaSimple?SIMPLE_RULES:'')),messages:[{role:'user',content:prompt}]})});
   var data=await resp.json();
   if(data.error)throw new Error(data.error.message||'The idea service returned an error.');
   var raw=data.content&&data.content.find(function(b){return b.type==='text';});
