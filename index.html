@@ -325,7 +325,9 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
     <button class="svb" onclick="setIdeaType('Dinner',this)" style="padding:10px 6px;font-size:13px">Dinner</button>
     <button class="svb" onclick="setIdeaType('Treat',this)" style="padding:10px 6px;font-size:13px">Treat</button>
     <button class="svb" onclick="setIdeaType('Anything',this)" style="padding:10px 6px;font-size:13px">Surprise me</button>
+    <button class="svb" onclick="setIdeaType('Shop',this)" style="padding:10px 6px;font-size:13px;grid-column:span 3">&#128722; Shop &amp; Pack &middot; store-bought staples to rotate</button>
    </div>
+   <button class="svb on" id="simpleBtn" onclick="toggleSimple()" style="width:100%;margin-top:8px;padding:10px 6px;font-size:13px">&#127890; Lunchbox simple: ON &middot; 5 min, no morning cooking</button>
   </div>
   <div class="frow" style="margin-top:12px">
    <label class="flbl">What's she tired of?</label>
@@ -499,7 +501,7 @@ function goTab(page,btn){
  if(page==='list')renderList();
  if(page==='rx')renderRx();
  if(page==='res')renderRes();
- if(page==='ideas'){renderTired();renderHits();}
+ if(page==='ideas'){renderTired();renderHits();paintSimple();}
  if(page==='builder'){curMealTypeChoice='';document.querySelectorAll('#mealTypeBtns .svb').forEach(function(b){b.classList.remove('on');});}
 }
 
@@ -987,6 +989,20 @@ var tiredOf = ['frozen blueberries','mango','cottage cheese'];
 var ideaHits = [];
 var shownIdeas = [];
 var ideaBatch = {};
+var ideaSimple = true;
+try{if(localStorage.getItem('rdg_simple')==='0')ideaSimple=false;}catch(e){}
+function toggleSimple(){
+ ideaSimple=!ideaSimple;
+ try{localStorage.setItem('rdg_simple',ideaSimple?'1':'0');}catch(e){}
+ paintSimple();
+}
+function paintSimple(){
+ var b=document.getElementById('simpleBtn');if(!b)return;
+ b.classList.toggle('on',ideaSimple);
+ b.innerHTML=ideaSimple?'&#127890; Lunchbox simple: ON &middot; 5 min, no morning cooking':'&#127890; Lunchbox simple: OFF &middot; all ideas, any effort';
+}
+var SIMPLE_RULES=' LUNCHBOX SIMPLE MODE IS ON: every idea must be something a busy parent can put together in 5 minutes or less on a school morning and pack into a lunch or breakfast box. No cooking that morning. Prep-ahead is only OK if it is a quick weekend batch item that keeps safely under the histamine rules. Mostly 1-4 ingredients, store-bought where possible, finger-food or spoonable, holds up a few hours in a lunch box with an ice pack, and needs no reheating. Do NOT pack leftover cooked meat because histamine rises in stored cooked meat. Keep the steps to 1-3 very short lines.';
+var SHOP_RULES=' SHOP & PACK MODE: instead of recipes, suggest single store-bought foods or very simple pairings (like how cottage cheese, blueberries, or mango worked for her) that fit all four diet rules, are easy to find at a regular grocery store, and pack straight into a lunch box. For each, "how" should be 1-2 short packing or serving tips, "time" should be "Grab & go", and "ingredients" should be just the item(s) to buy. Mention any label to check (for example no added sugar, no gums or fillers) in the "what" line.';
 try{var _t=localStorage.getItem('rdg_tired');if(_t)tiredOf=JSON.parse(_t);var _h=localStorage.getItem('rdg_hits');if(_h)ideaHits=JSON.parse(_h);}catch(e){}
 function saveIdeas(){try{localStorage.setItem('rdg_tired',JSON.stringify(tiredOf));localStorage.setItem('rdg_hits',JSON.stringify(ideaHits));}catch(e){}}
 function escH(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -1014,7 +1030,8 @@ window.getFreshIdeas = async function(more){
  var resEl=document.getElementById('ideasResult');
  var onHand=document.getElementById('ideaOnHand').value.trim();
  if(!more)shownIdeas=[];
- var prompt='Give me 6 fresh '+(ideaType==='Anything'?'snack or meal':ideaType.toLowerCase())+' ideas for my daughter.'+
+ var kind=ideaType==='Shop'?'store-bought staple foods to buy and pack':(ideaType==='Anything'?'snack or meal':ideaType.toLowerCase());
+ var prompt='Give me 6 fresh '+kind+' ideas for my daughter.'+
   (tiredOf.length?' She is tired of: '+tiredOf.join(', ')+'.':'')+
   (onHand?' Use some of what I have on hand if it fits the rules: '+onHand+'.':'')+
   (shownIdeas.length?' Do not repeat any of these ideas already suggested: '+shownIdeas.join('; ')+'.':'')+
@@ -1022,7 +1039,7 @@ window.getFreshIdeas = async function(more){
  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Thinking up ideas...';
  if(!more)resEl.innerHTML='<div style="text-align:center;padding:24px;font-size:14px;color:var(--t2)">Raiding the idea pantry...</div>';
  try{
-  var resp=await fetch(API_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:2500,system:IDEAS_PROMPT,messages:[{role:'user',content:prompt}]})});
+  var resp=await fetch(API_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:2500,system:IDEAS_PROMPT+(ideaType==='Shop'?SHOP_RULES:(ideaSimple?SIMPLE_RULES:'')),messages:[{role:'user',content:prompt}]})});
   var data=await resp.json();
   if(data.error)throw new Error(data.error.message||'The idea service returned an error.');
   var raw=data.content&&data.content.find(function(b){return b.type==='text';});
@@ -1063,7 +1080,7 @@ function remHit(id){ideaHits=ideaHits.filter(function(h){return h.id!==id;});sav
 function renderHits(){
  var el=document.getElementById('ideaHits');
  if(!ideaHits.length){el.innerHTML='';return;}
- el.innerHTML='<div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin:18px 0 8px">&#11088; Her Hits ('+ideaHits.length+')</div>'+ideaHits.map(function(h){return ideaCard(h,h.id,true);}).join('');
+ el.innerHTML='<div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin:18px 0 8px">&#11088; Her Hits &middot; keep these in rotation ('+ideaHits.length+')</div>'+ideaHits.map(function(h){return ideaCard(h,h.id,true);}).join('');
 }
 function ideaToList(id,btn,isHit){
  var idea=findIdea(id,isHit);if(!idea||!idea.ingredients)return;
@@ -1078,7 +1095,7 @@ function ideaToBuilder(id,isHit){
  var tabs=document.querySelectorAll('#mainTabs .tab'),bBtn=null;
  tabs.forEach(function(t){if(t.textContent.indexOf('Recipe Builder')>-1)bBtn=t;});
  goTab('builder',bBtn);
- var want=(ideaType==='Anything'||ideaType==='Treat')?'Snack':ideaType;
+ var want=(ideaType==='Anything'||ideaType==='Treat'||ideaType==='Shop')?'Snack':ideaType;
  document.querySelectorAll('#mealTypeBtns .svb').forEach(function(b){if(b.textContent.indexOf(want)>-1)setMealType(want,b);});
  document.getElementById('builder-ingredients').value=(idea.ingredients||[]).join(', ');
  document.getElementById('builder-notes').value='Make this idea: '+idea.name+' ('+idea.what+')';
