@@ -846,6 +846,38 @@ function renderRes(){
 }
 
 
+
+// ── AI RESPONSE HELPERS ─────────────────────────────────
+// Joins every text block in the reply and pulls out the JSON object, even if
+// the AI wrapped it in extra words or code fences.
+function aiText(data){
+ if(!data||!data.content)return '';
+ return data.content.filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+}
+function aiJSON(data){
+ var t=aiText(data).replace(/```json|```/g,'').trim();
+ var a=t.indexOf('{'),b=t.lastIndexOf('}');
+ if(a>-1&&b>a){try{return JSON.parse(t.slice(a,b+1));}catch(e){}}
+ if(data&&data.stop_reason==='max_tokens')throw new Error('The answer ran too long and got cut off. Please try again.');
+ return JSON.parse(t.slice(a>-1?a:0));
+}
+// For Fresh Ideas: if the reply was cut off, keep every idea that came through whole.
+function aiIdeas(data){
+ try{var p=aiJSON(data);if(p&&p.ideas&&p.ideas.length)return p.ideas;}catch(e){}
+ var t=aiText(data),start=t.indexOf('['),out=[];
+ if(start<0)throw new Error('The idea service sent back something unexpected. Please try again.');
+ var depth=0,inStr=false,esc=false,objStart=-1;
+ for(var i=start+1;i<t.length;i++){
+  var c=t[i];
+  if(inStr){if(esc)esc=false;else if(c==='\\')esc=true;else if(c==='"')inStr=false;continue;}
+  if(c==='"'){inStr=true;continue;}
+  if(c==='{'){if(depth===0)objStart=i;depth++;}
+  else if(c==='}'){depth--;if(depth===0&&objStart>-1){try{out.push(JSON.parse(t.slice(objStart,i+1)));}catch(e){}objStart=-1;}}
+  else if(c===']'&&depth===0)break;
+ }
+ if(!out.length)throw new Error('The answer got cut off before any ideas came through. Please try again.');
+ return out;
+}
 // ── FAMILY RULES (generated from the Foods tab) ─────────
 // The AI tools follow whatever the Foods tab says. Change a food's status there
 // and the Scanner, Recipe Builder and Fresh Ideas all follow along.
@@ -882,13 +914,11 @@ window.buildRecipe = async function() {
   var resp = await fetch(API_PROXY_URL, {
    method: 'POST',
    headers: {'Content-Type':'application/json'},
-   body: JSON.stringify({model:'claude-sonnet-5', max_tokens:1500, system:BUILDER_PROMPT+familyRules(), messages:[{role:'user',content:prompt}]})
+   body: JSON.stringify({model:'claude-sonnet-5', max_tokens:6000, system:BUILDER_PROMPT+familyRules(), messages:[{role:'user',content:prompt}]})
   });
   var data = await resp.json();
   if(data.error){throw new Error(data.error.message || 'The recipe service returned an error.');}
-  var rawText = data.content && data.content.find(function(b){return b.type==='text';});
-  rawText = rawText ? rawText.text : '';
-  var recipe = JSON.parse(rawText.replace(/```json|```/g,'').trim());
+  var recipe = aiJSON(data);
   var ingr = '';
   recipe.ingredients.forEach(function(x){ingr += '<li>' + x + '</li>';});
   var steps = '';
@@ -973,12 +1003,10 @@ window.doScan = async function(){
   var messages;
   if(photoB64)messages=[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:photoB64}},{type:"text",text:"Analyze this product label for the diet described."}]}];
   else messages=[{role:"user",content:'Analyze this product: "'+txt+'"'}];
-  var resp=await fetch(API_PROXY_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1000,system:SYSPROMPT+familyRules(),messages:messages})});
+  var resp=await fetch(API_PROXY_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-5",max_tokens:4000,system:SYSPROMPT+familyRules(),messages:messages})});
   var data=await resp.json();
   if(data.error){throw new Error(data.error.message || 'The scanner service returned an error.');}
-  var rawText=data.content&&data.content.find(function(b){return b.type==='text';});
-  rawText=rawText?rawText.text:'';
-  var result=JSON.parse(rawText.replace(/```json|```/g,'').trim());
+  var result=aiJSON(data);
   var vc=result.verdict==='allowed'?'rok':result.verdict==='avoid'?'rno':'rca';
   var vi=result.verdict==='allowed'?'&#10003;':result.verdict==='avoid'?'&#10007;':'~';
   var vl=result.verdict==='allowed'?'Safe to use':result.verdict==='avoid'?'Avoid':'Use with caution';
@@ -1035,7 +1063,7 @@ function addTired(){
 }
 function remTired(i){tiredOf.splice(i,1);saveIdeas();renderTired();}
 
-var IDEAS_PROMPT = BUILDER_PROMPT.split('Respond ONLY')[0] + 'You are now helping a parent whose daughter is bored with her usual foods. Suggest fresh, genuinely different ideas that are quick, simple, and fun for a 4-year-old, using everyday ingredients. Where helpful, borrow what she probably likes about the foods she is tired of (cold, creamy, sweet-tart, finger food, etc.) but in a new form. Never suggest anything she is tired of as the main feature. Respond ONLY in this exact JSON with no markdown and no preamble: {"ideas":[{"name":"short fun name","emoji":"one emoji","time":"e.g. 5 min","what":"one sentence describing it","how":["2-4 short steps"],"why":"one short sentence on why it is a nice switch for her","ingredients":["ingredient names only, for a shopping list"]}]} Give exactly 6 ideas.';
+var IDEAS_PROMPT = BUILDER_PROMPT.split('Respond ONLY')[0] + 'You are now helping a parent whose daughter is bored with her usual foods. Suggest fresh, genuinely different ideas that are quick, simple, and fun for a 4-year-old, using everyday ingredients. Where helpful, borrow what she probably likes about the foods she is tired of (cold, creamy, sweet-tart, finger food, etc.) but in a new form. Never suggest anything she is tired of as the main feature. Respond ONLY in this exact JSON with no markdown and no preamble: {"ideas":[{"name":"short fun name","emoji":"one emoji","time":"e.g. 5 min","what":"one sentence describing it","how":["2-3 short steps, under 15 words each"],"why":"one short sentence on why it is a nice switch for her","ingredients":["ingredient names only, for a shopping list"]}]} Give exactly 6 ideas.';
 
 window.getFreshIdeas = async function(more){
  var btn=document.getElementById('ideasbtn');
@@ -1051,12 +1079,10 @@ window.getFreshIdeas = async function(more){
  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Thinking up ideas...';
  if(!more)resEl.innerHTML='<div style="text-align:center;padding:24px;font-size:14px;color:var(--t2)">Raiding the idea pantry...</div>';
  try{
-  var resp=await fetch(API_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:2500,system:IDEAS_PROMPT+familyRules()+(ideaType==='Shop'?SHOP_RULES:(ideaSimple?SIMPLE_RULES:'')),messages:[{role:'user',content:prompt}]})});
+  var resp=await fetch(API_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:8000,system:IDEAS_PROMPT+familyRules()+(ideaType==='Shop'?SHOP_RULES:(ideaSimple?SIMPLE_RULES:'')),messages:[{role:'user',content:prompt}]})});
   var data=await resp.json();
   if(data.error)throw new Error(data.error.message||'The idea service returned an error.');
-  var raw=data.content&&data.content.find(function(b){return b.type==='text';});
-  raw=raw?raw.text:'';
-  var parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+  var parsed={ideas:aiIdeas(data)};
   var html=more?resEl.innerHTML.replace(/<button class="btn" id="moreIdeasBtn"[\s\S]*$/,''):'';
   parsed.ideas.forEach(function(idea){
    var id='i'+Date.now()+Math.floor(Math.random()*1e6);
@@ -1066,7 +1092,7 @@ window.getFreshIdeas = async function(more){
   html+='<button class="btn" id="moreIdeasBtn" onclick="getFreshIdeas(true)" style="background:var(--bg);color:var(--gd);border:1px solid var(--g);margin-bottom:16px">&#128260; Show Me More</button>';
   resEl.innerHTML=html;
  }catch(err){
-  resEl.innerHTML='<div class="rbox rca"><div class="rtitle">Could not get ideas</div><div class="rbody">Check your network and try again.<br><small style="color:var(--t3)">'+escH(err.message)+'</small></div></div>';
+  resEl.innerHTML='<div class="rbox rca"><div class="rtitle">Could not get ideas</div><div class="rbody">Something hiccupped. Tap the button to try again.<br><small style="color:var(--t3)">'+escH(err.message)+'</small></div></div>';
  }
  btn.disabled=false;btn.innerHTML='&#10024; Give Me Fresh Ideas';
 };
