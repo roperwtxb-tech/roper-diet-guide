@@ -154,6 +154,19 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
 .cite{font-size:11px;color:var(--t3);font-style:italic;margin-bottom:10px}
 .empty{text-align:center;padding:36px 20px;color:var(--t3);font-size:14px;line-height:1.6}
 .mtype-btn.on{background:var(--gl);border-color:var(--g);color:var(--gd);font-weight:700}
+.idea-card{background:var(--bg);border:1px solid var(--bdr);border-radius:12px;padding:13px 14px;margin-bottom:10px}
+.idea-top{display:flex;gap:10px;align-items:flex-start}
+.idea-emoji{font-size:26px;line-height:1}
+.idea-name{font-size:15px;font-weight:700;color:var(--t1)}
+.idea-meta{font-size:11px;color:var(--t3);margin-top:2px}
+.idea-why{font-size:12px;color:var(--gd);background:var(--gl);border-radius:8px;padding:6px 9px;margin-top:8px;line-height:1.45}
+.idea-how{font-size:13px;color:var(--t2);line-height:1.5;margin:8px 0 0 18px;padding:0}
+.idea-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.idea-btn{font-size:12px;font-weight:600;padding:7px 11px;border-radius:8px;border:1px solid var(--bdr);background:var(--bg);color:var(--t2);cursor:pointer}
+.idea-btn.hit{border-color:var(--g);background:var(--gl);color:var(--gd)}
+.idea-btn.done{background:var(--g);border-color:var(--g);color:#fff}
+.tired-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 9px;border-radius:999px;background:var(--al);color:var(--ad);margin:0 6px 6px 0}
+.tired-chip button{border:none;background:none;color:var(--ad);cursor:pointer;font-size:14px;line-height:1;padding:0}
 .gen-card{background:var(--bg);border:2px solid var(--g);border-radius:12px;padding:15px;margin-top:4px}
 .gen-title{font-size:17px;font-weight:700;color:var(--gd);margin-bottom:4px}
 .gen-meta{font-size:12px;color:var(--t3);margin-bottom:12px}
@@ -181,6 +194,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
    <button class="tab" onclick="goTab('rx',this)">Reactions <span class="cbdg" id="rxc" style="display:none">0</span></button>
    <button class="tab" onclick="goTab('res',this)">Resources</button>
    <button class="tab" onclick="goTab('builder',this)">&#127859; Recipe Builder</button>
+   <button class="tab" onclick="goTab('ideas',this)">&#10024; Fresh Ideas</button>
   </div>
  </div>
 </nav>
@@ -297,6 +311,39 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
   <button class="btn" id="builderbtn" onclick="buildRecipe()" style="margin-top:8px">&#127859; Build My Recipe</button>
  </div>
  <div id="builderResult"></div>
+</div>
+
+<div class="pg" id="pg-ideas">
+ <div class="infobox"><strong>Fresh Ideas.</strong> Stuck in a rut? Tell us what she's tired of and get new ideas that still follow all four diet rules. Keep the ones she loves as Hits.</div>
+ <div style="background:var(--bg);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+  <div class="frow">
+   <label class="flbl">What kind of idea?</label>
+   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px" id="ideaTypeBtns">
+    <button class="svb on" onclick="setIdeaType('Snack',this)" style="padding:10px 6px;font-size:13px">Snack</button>
+    <button class="svb" onclick="setIdeaType('Breakfast',this)" style="padding:10px 6px;font-size:13px">&#9728; Breakfast</button>
+    <button class="svb" onclick="setIdeaType('Lunch',this)" style="padding:10px 6px;font-size:13px">Lunch</button>
+    <button class="svb" onclick="setIdeaType('Dinner',this)" style="padding:10px 6px;font-size:13px">Dinner</button>
+    <button class="svb" onclick="setIdeaType('Treat',this)" style="padding:10px 6px;font-size:13px">Treat</button>
+    <button class="svb" onclick="setIdeaType('Anything',this)" style="padding:10px 6px;font-size:13px">Surprise me</button>
+   </div>
+  </div>
+  <div class="frow" style="margin-top:12px">
+   <label class="flbl">What's she tired of?</label>
+   <div id="tiredChips" style="margin-top:4px"></div>
+   <div style="display:flex;gap:6px">
+    <input class="finp" id="tiredInput" type="text" placeholder="e.g. frozen blueberries" style="flex:1" onkeydown="if(event.key==='Enter'){addTired();}"/>
+    <button class="idea-btn" onclick="addTired()" style="white-space:nowrap">+ Add</button>
+   </div>
+   <div style="font-size:11px;color:var(--t3);margin-top:4px">This list is remembered. Remove things once she's ready for them again.</div>
+  </div>
+  <div class="frow" style="margin-top:4px">
+   <label class="flbl">Anything on hand to use? (optional)</label>
+   <input class="finp" id="ideaOnHand" type="text" placeholder="e.g. pears, coconut yogurt, almond butter..."/>
+  </div>
+  <button class="btn" id="ideasbtn" onclick="getFreshIdeas(false)" style="margin-top:8px">&#10024; Give Me Fresh Ideas</button>
+ </div>
+ <div id="ideasResult"></div>
+ <div id="ideaHits"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -452,6 +499,7 @@ function goTab(page,btn){
  if(page==='list')renderList();
  if(page==='rx')renderRx();
  if(page==='res')renderRes();
+ if(page==='ideas'){renderTired();renderHits();}
  if(page==='builder'){curMealTypeChoice='';document.querySelectorAll('#mealTypeBtns .svb').forEach(function(b){b.classList.remove('on');});}
 }
 
@@ -932,6 +980,111 @@ window.doScan = async function(){
 };
 
 // ── INIT ────────────────────────────────────────────────
+
+// ── FRESH IDEAS ──────────────────────────────────────────
+var ideaType = 'Snack';
+var tiredOf = ['frozen blueberries','mango','cottage cheese'];
+var ideaHits = [];
+var shownIdeas = [];
+var ideaBatch = {};
+try{var _t=localStorage.getItem('rdg_tired');if(_t)tiredOf=JSON.parse(_t);var _h=localStorage.getItem('rdg_hits');if(_h)ideaHits=JSON.parse(_h);}catch(e){}
+function saveIdeas(){try{localStorage.setItem('rdg_tired',JSON.stringify(tiredOf));localStorage.setItem('rdg_hits',JSON.stringify(ideaHits));}catch(e){}}
+function escH(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+function setIdeaType(type,btn){
+ ideaType=type;
+ document.querySelectorAll('#ideaTypeBtns .svb').forEach(function(b){b.classList.remove('on');});
+ btn.classList.add('on');
+}
+function renderTired(){
+ var el=document.getElementById('tiredChips');
+ el.innerHTML=tiredOf.length?tiredOf.map(function(t,i){return '<span class="tired-chip">'+escH(t)+' <button onclick="remTired('+i+')" aria-label="Remove">&times;</button></span>';}).join(''):'<div style="font-size:12px;color:var(--t3);margin-bottom:6px">Nothing yet.</div>';
+}
+function addTired(){
+ var inp=document.getElementById('tiredInput');
+ inp.value.split(',').forEach(function(v){v=v.trim();if(v&&tiredOf.indexOf(v.toLowerCase())===-1)tiredOf.push(v.toLowerCase());});
+ inp.value='';saveIdeas();renderTired();
+}
+function remTired(i){tiredOf.splice(i,1);saveIdeas();renderTired();}
+
+var IDEAS_PROMPT = BUILDER_PROMPT.split('Respond ONLY')[0] + 'You are now helping a parent whose daughter is bored with her usual foods. Suggest fresh, genuinely different ideas that are quick, simple, and fun for a 4-year-old, using everyday ingredients. Where helpful, borrow what she probably likes about the foods she is tired of (cold, creamy, sweet-tart, finger food, etc.) but in a new form. Never suggest anything she is tired of as the main feature. Respond ONLY in this exact JSON with no markdown and no preamble: {"ideas":[{"name":"short fun name","emoji":"one emoji","time":"e.g. 5 min","what":"one sentence describing it","how":["2-4 short steps"],"why":"one short sentence on why it is a nice switch for her","ingredients":["ingredient names only, for a shopping list"]}]} Give exactly 6 ideas.';
+
+window.getFreshIdeas = async function(more){
+ var btn=document.getElementById('ideasbtn');
+ var resEl=document.getElementById('ideasResult');
+ var onHand=document.getElementById('ideaOnHand').value.trim();
+ if(!more)shownIdeas=[];
+ var prompt='Give me 6 fresh '+(ideaType==='Anything'?'snack or meal':ideaType.toLowerCase())+' ideas for my daughter.'+
+  (tiredOf.length?' She is tired of: '+tiredOf.join(', ')+'.':'')+
+  (onHand?' Use some of what I have on hand if it fits the rules: '+onHand+'.':'')+
+  (shownIdeas.length?' Do not repeat any of these ideas already suggested: '+shownIdeas.join('; ')+'.':'')+
+  (ideaHits.length?' She already loves: '+ideaHits.map(function(h){return h.name;}).join(', ')+', so suggest different ones.':'');
+ btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Thinking up ideas...';
+ if(!more)resEl.innerHTML='<div style="text-align:center;padding:24px;font-size:14px;color:var(--t2)">Raiding the idea pantry...</div>';
+ try{
+  var resp=await fetch(API_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:2500,system:IDEAS_PROMPT,messages:[{role:'user',content:prompt}]})});
+  var data=await resp.json();
+  if(data.error)throw new Error(data.error.message||'The idea service returned an error.');
+  var raw=data.content&&data.content.find(function(b){return b.type==='text';});
+  raw=raw?raw.text:'';
+  var parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+  var html=more?resEl.innerHTML.replace(/<button class="btn" id="moreIdeasBtn"[\s\S]*$/,''):'';
+  parsed.ideas.forEach(function(idea){
+   var id='i'+Date.now()+Math.floor(Math.random()*1e6);
+   ideaBatch[id]=idea;shownIdeas.push(idea.name);
+   html+=ideaCard(idea,id,false);
+  });
+  html+='<button class="btn" id="moreIdeasBtn" onclick="getFreshIdeas(true)" style="background:var(--bg);color:var(--gd);border:1px solid var(--g);margin-bottom:16px">&#128260; Show Me More</button>';
+  resEl.innerHTML=html;
+ }catch(err){
+  resEl.innerHTML='<div class="rbox rca"><div class="rtitle">Could not get ideas</div><div class="rbody">Check your network and try again.<br><small style="color:var(--t3)">'+escH(err.message)+'</small></div></div>';
+ }
+ btn.disabled=false;btn.innerHTML='&#10024; Give Me Fresh Ideas';
+};
+
+function ideaCard(idea,id,isHit){
+ var how=(idea.how||[]).map(function(x){return '<li>'+escH(x)+'</li>';}).join('');
+ var btns=isHit
+  ?'<button class="idea-btn" onclick="ideaToList(\''+id+'\',this,true)">+ Shopping list</button><button class="idea-btn" onclick="ideaToBuilder(\''+id+'\',true)">&#127859; Full recipe</button><button class="idea-btn" onclick="remHit(\''+id+'\')">Remove</button>'
+  :'<button class="idea-btn hit" onclick="markHit(\''+id+'\',this)">&#11088; She loved it</button><button class="idea-btn" onclick="ideaToList(\''+id+'\',this,false)">+ Shopping list</button><button class="idea-btn" onclick="ideaToBuilder(\''+id+'\',false)">&#127859; Full recipe</button>';
+ return '<div class="idea-card"><div class="idea-top"><div class="idea-emoji">'+escH(idea.emoji||'✨')+'</div><div style="flex:1"><div class="idea-name">'+escH(idea.name)+'</div><div class="idea-meta">'+escH(idea.time||'')+'</div><div style="font-size:13px;color:var(--t2);margin-top:4px;line-height:1.45">'+escH(idea.what)+'</div></div></div>'+
+  (how?'<ol class="idea-how">'+how+'</ol>':'')+
+  (idea.why?'<div class="idea-why">'+escH(idea.why)+'</div>':'')+
+  '<div class="idea-btns">'+btns+'</div></div>';
+}
+function findIdea(id,isHit){if(!isHit)return ideaBatch[id];var h=ideaHits.filter(function(x){return x.id===id;})[0];return h;}
+function markHit(id,btn){
+ var idea=ideaBatch[id];if(!idea)return;
+ if(ideaHits.some(function(h){return h.name===idea.name;})){toast('Already in Hits');return;}
+ var copy=JSON.parse(JSON.stringify(idea));copy.id=id;ideaHits.unshift(copy);saveIdeas();renderHits();
+ btn.classList.add('done');btn.innerHTML='&#11088; Saved to Hits';toast('Saved to Hits');
+}
+function remHit(id){ideaHits=ideaHits.filter(function(h){return h.id!==id;});saveIdeas();renderHits();}
+function renderHits(){
+ var el=document.getElementById('ideaHits');
+ if(!ideaHits.length){el.innerHTML='';return;}
+ el.innerHTML='<div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin:18px 0 8px">&#11088; Her Hits ('+ideaHits.length+')</div>'+ideaHits.map(function(h){return ideaCard(h,h.id,true);}).join('');
+}
+function ideaToList(id,btn,isHit){
+ var idea=findIdea(id,isHit);if(!idea||!idea.ingredients)return;
+ var added=0;
+ idea.ingredients.forEach(function(item){
+  if(!shopList.some(function(i){return i.n.toLowerCase()===item.toLowerCase();})){shopList.push({id:Date.now()+Math.random(),n:item,cat:'Other',done:false});added++;}
+ });
+ save();updateListBadge();toast(added?added+' item'+(added>1?'s':'')+' added to list':'Already on your list');
+}
+function ideaToBuilder(id,isHit){
+ var idea=findIdea(id,isHit);if(!idea)return;
+ var tabs=document.querySelectorAll('#mainTabs .tab'),bBtn=null;
+ tabs.forEach(function(t){if(t.textContent.indexOf('Recipe Builder')>-1)bBtn=t;});
+ goTab('builder',bBtn);
+ var want=(ideaType==='Anything'||ideaType==='Treat')?'Snack':ideaType;
+ document.querySelectorAll('#mealTypeBtns .svb').forEach(function(b){if(b.textContent.indexOf(want)>-1)setMealType(want,b);});
+ document.getElementById('builder-ingredients').value=(idea.ingredients||[]).join(', ');
+ document.getElementById('builder-notes').value='Make this idea: '+idea.name+' ('+idea.what+')';
+ window.scrollTo(0,0);toast('Ready — tap Build My Recipe');
+}
+
 load();
 buildCatPills();
 buildListCats();
