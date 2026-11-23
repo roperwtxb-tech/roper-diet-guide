@@ -269,6 +269,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
 <div class="pg" id="pg-favs"><div id="favsGrid"></div></div>
 
 <div class="pg" id="pg-rx">
+ <div id="trialBox"></div>
  <div class="rxform">
   <h3>Log a reaction or food to avoid</h3>
   <div class="frow"><label class="flbl">Food or product name *</label><input class="finp" id="rx-name" type="text" placeholder="e.g. Store-bought chicken stock"/></div>
@@ -351,6 +352,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
  <div id="ideaHits"></div>
 </div>
 
+<div style="max-width:720px;margin:18px auto 0;padding:0 16px;text-align:center;font-size:12px;color:var(--t3)">Our apps: <a href="https://roperwtxb-tech.github.io/roped-in-ranch/roped-in-ranch.html" target="_blank" rel="noopener" style="color:var(--g)">Ranch</a> &middot; <a href="https://roperwtxb-tech.github.io/homestead-guide/homestead-guide.html" target="_blank" rel="noopener" style="color:var(--g)">Field Guide</a> &middot; <strong style="color:var(--t2)">Diet Guide</strong></div>
 <div class="toast" id="toast"></div>
 <script>
 try {
@@ -481,7 +483,7 @@ var MEALS = [
 
 // ── RESOURCES DATA ──────────────────────────────────────
 var RES = [
- {icon:"&#11088;",title:"Riley's Rules",sub:"Our priority order, and what's a hard no",body:"<h3>When rules conflict, this order wins</h3><ul><li><strong>1. Gluten-free</strong> &mdash; a must, no exceptions.</li><li><strong>2. Low histamine</strong> &mdash; very close behind. Almost everything high-histamine is a hard no.</li><li><strong>3. Low sugar</strong> &mdash; close behind. High sugar is a hard no.</li><li><strong>4. GAPS</strong> &mdash; the guide we lean on, but if a food passes the first three and only GAPS objects, it's a Caution, not an Avoid.</li></ul><h3>Hard no's</h3><ul><li>Any gluten</li><li>High sugar</li><li>Strawberries, bananas, citrus, tomatoes, avocado, eggplant, spinach</li><li><strong>Leftovers</strong>: cook fresh, freeze extra right away</li><li>Fermented, aged, cured, smoked or canned foods</li><li>Processed store-bought milk (including 2%)</li><li>Any high-histamine food she hasn't been introduced to yet</li></ul><h3>Okay for Riley</h3><ul><li><strong>Eggs cooked into food</strong> (pancakes, muffins, a binder in patties). Not egg dishes like omelets or quiche.</li><li><strong>Raw milk and goat milk.</strong></li></ul><h3>The rest of the family</h3><p>Canning, dehydrating, curing and fermenting from the Field Guide are fine for everyone else. For Riley, the go-to is fresh, or frozen right away.</p><p class='cite'>Update this list as new foods get introduced.</p>"},
+ {icon:"&#11088;",title:"Riley's Rules",sub:"Our priority order, and what's a hard no",body:"<h3>When rules conflict, this order wins</h3><ul><li><strong>1. Gluten-free</strong> &mdash; a must, no exceptions.</li><li><strong>2. Low histamine</strong> &mdash; very close behind. Almost everything high-histamine is a hard no.</li><li><strong>3. Low sugar</strong> &mdash; close behind. High sugar is a hard no.</li><li><strong>4. GAPS</strong> &mdash; the guide we lean on, but if a food passes the first three and only GAPS objects, it's a Caution, not an Avoid.</li></ul><h3>Hard no's</h3><ul><li>Any gluten</li><li>High sugar</li><li>Strawberries, bananas, citrus, tomatoes, avocado, eggplant, spinach</li><li><strong>Leftovers</strong>: cook fresh, freeze extra right away</li><li>Fermented, aged, cured, smoked or canned foods</li><li>Processed store-bought milk (including 2%)</li><li>Any high-histamine food she hasn't been introduced to yet</li></ul><h3>Okay for Riley</h3><ul><li><strong>Eggs cooked into food</strong> (pancakes, muffins, a binder in patties). Not egg dishes like omelets or quiche.</li><li><strong>Raw milk and goat milk.</strong></li></ul><h3>The rest of the family</h3><p>Canning, dehydrating, curing and fermenting from the <a href='https://roperwtxb-tech.github.io/homestead-guide/homestead-guide.html' target='_blank' rel='noopener'>Field Guide</a> are fine for everyone else. For Riley, the go-to is fresh, or frozen right away. The Field Guide also has <a href='https://roperwtxb-tech.github.io/homestead-guide/homestead-guide.html#preserve/freezing' target='_blank' rel='noopener'>freezing how-tos</a>, <a href='https://roperwtxb-tech.github.io/homestead-guide/homestead-guide.html#garden/calendar' target='_blank' rel='noopener'>what to plant when</a>, and <a href='https://roperwtxb-tech.github.io/homestead-guide/homestead-guide.html#livestock/goats/l-goat-milk' target='_blank' rel='noopener'>goat milk handling</a>.</p><p class='cite'>Update this list as new foods get introduced.</p>"},
  {icon:"&#127807;",title:"Gluten-Free Diet",sub:"What it is and why it matters",body:"<h3>What is gluten?</h3><p>Gluten is a protein found in wheat, barley, rye and most oats. In people with celiac disease or gluten sensitivity it triggers an immune response that damages the small intestine lining, impairing nutrient absorption and causing widespread inflammation.</p><h3>What to avoid</h3><ul><li><strong>Wheat products</strong> - bread, pasta, flour, crackers, biscuits, pizza dough</li><li><strong>Barley and rye</strong> - often in soups, cereals, malt products</li><li><strong>Hidden gluten</strong> - soy sauce, bouillon cubes, malt vinegar, many spice blends</li><li><strong>Cross-contamination</strong> - shared cooking surfaces, fryer oil, restaurant kitchens</li></ul><h3>In this combined protocol</h3><p>Because GAPS already excludes all grains, the combined protocol is automatically gluten-free. The GF label helps catch hidden gluten in processed products and seasonings. Use the Scanner tab to check any unfamiliar product.</p><h3>Research</h3><p>A 2022 systematic review in <em>Nutrients</em> confirmed that a strict gluten-free diet leads to significant improvements in intestinal permeability, symptom burden and quality of life in children with celiac disease and gluten sensitivity.</p><p class='cite'>Vici et al., Nutrients (2022); Catassi et al., Nutrients (2017)</p>"},
  {icon:"&#127852;",title:"Low Sugar Diet",sub:"Reducing sugar to support gut, immune and brain health",body:"<h3>Why eliminate sugar?</h3><p>Refined sugar feeds pathogenic bacteria and yeast in the gut, creates blood sugar spikes that affect mood and behavior, undermines immune function and drives systemic inflammation. For children with dysbiosis, sugar removal is foundational.</p><h3>All forms to avoid</h3><ul><li><strong>Obvious sugars</strong> - white sugar, brown sugar, cane sugar, coconut sugar</li><li><strong>Liquid sweeteners</strong> - maple syrup, agave, corn syrup, date syrup</li><li><strong>Fruit juice</strong> - even 100% natural juice concentrates sugars rapidly</li><li><strong>Hidden sugars</strong> - most store-bought sauces, dressings, snacks, cereals, flavored yogurts</li><li><strong>Artificial sweeteners</strong> - not recommended for children, can alter gut microbiome</li></ul><h3>What is allowed</h3><p>Raw honey in very small amounts is the one sweetener permitted on GAPS. Think 1/4 to 1/2 teaspoon maximum, not a daily staple. Natural sugars in low-glycemic whole fruits like pears, apples and blueberries are allowed in moderation after GAPS intro.</p><h3>Benefits</h3><ul><li>Reduces Candida and pathogenic yeast overgrowth</li><li>Stabilizes energy and mood, fewer tantrums and crashes</li><li>Reduces systemic inflammation</li><li>Supports a healthier, more diverse gut microbiome</li><li>May reduce skin conditions, irritability and sleep disruption</li></ul><p class='cite'>Satokari (2020) Nutrients; Spreadbury (2012) Acta Physiologica</p>"},
  {icon:"&#128300;",title:"Low Histamine Diet",sub:"Understanding histamine intolerance in children",body:"<h3>What is histamine?</h3><p>Histamine is a naturally occurring chemical involved in immune responses, digestion and neurotransmitter signaling. Normally an enzyme called DAO (diamine oxidase) breaks it down in the gut. When DAO activity is low due to gut inflammation or dysbiosis, histamine accumulates and causes symptoms.</p><h3>Common symptoms in children</h3><ul><li><strong>Skin</strong> - hives, rashes, flushing, eczema flares</li><li><strong>Digestive</strong> - diarrhea, stomach pain, bloating, reflux</li><li><strong>Behavioral</strong> - irritability, hyperactivity, poor sleep, moodiness</li><li><strong>Respiratory</strong> - runny nose, congestion without infection</li></ul><h3>High histamine foods to avoid</h3><ul><li>Fermented and aged foods - sauerkraut, kimchi, vinegar, pickles, aged cheeses</li><li>Processed and cured meats - deli meats, sausages, smoked fish</li><li>Canned fish - tuna, sardines, anchovies</li><li>Tomatoes, eggplant, avocado, spinach in large amounts</li></ul><h3>Histamine liberators</h3><p>These trigger the body to release its own histamine: strawberries, citrus fruits, chocolate, artificial food dyes, preservatives and MSG.</p><h3>The freshness rule</h3><p>Histamine forms as food ages. A freshly cooked chicken breast is low histamine. The same chicken refrigerated overnight can be significantly higher. Cook fresh, eat fresh, freeze immediately what you cannot eat.</p><h3>The good news</h3><p>DAO enzyme production often improves significantly as the gut heals on GAPS. Many families find that after 6-18 months their child can gradually tolerate foods that previously caused reactions.</p><p class='cite'>Maintz and Novak (2007) AJCN; Comas-Baste et al. (2020) Biomolecules</p>"},
@@ -507,7 +509,7 @@ function goTab(page,btn){
  if(page==='meals')renderMeals();
  if(page==='favs')renderFavs();
  if(page==='list')renderList();
- if(page==='rx')renderRx();
+ if(page==='rx'){renderTrials();renderRx();}
  if(page==='res')renderRes();
  if(page==='ideas'){renderTired();renderHits();paintSimple();}
  if(page==='builder'){curMealTypeChoice='';document.querySelectorAll('#mealTypeBtns .svb').forEach(function(b){b.classList.remove('on');});}
@@ -564,6 +566,7 @@ function renderFoods(){
     var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';
     tags+='<span class="dt '+tc+'">'+k.toUpperCase()+':'+vi+'</span>';
    });
+   if(f.trial)tags='<span class="dt '+(f.s==='avoid'?'dtno':'dtok')+'">'+(f.trial.status==='reacted'?'Reacted ':'Tried ')+f.trial.start+(f.trial.status==='reacted'?' &#10007;':' &#10003;')+'</span>'+tags;
    var sbg=f.sh?'<button class="sbx sbg" onclick="event.stopPropagation();addFoodToList(\''+f.n.replace(/'/g,"\\'")+'\',\''+f.sh+'\')">+List</button>':'';
    var sbl='<button class="sbx sbr" onclick="event.stopPropagation();prefillRx(\''+f.n.replace(/'/g,"\\'")+'\')">Log</button>';
    html+='<div class="fc'+(openFood===f.n?' open':'')+'" onclick="toggleFood(\''+f.n.replace(/'/g,"\\'")+'\')">'+
@@ -1149,6 +1152,74 @@ function ideaToBuilder(id,isHit){
  window.scrollTo(0,0);toast('Ready — tap Build My Recipe');
 }
 
+// ── NEW-FOOD TRIALS (Nov 2026) ──────────────────────────
+// Try one new food at a time and watch for 3 days. "Did fine" moves it to
+// Caution on the Foods tab (then "Mark allowed" when you're sure); "Reacted"
+// makes it Avoid and opens the reactions log to record what happened.
+// The AI tools follow the Foods tab, so they pick these changes up too.
+var intros=[];
+try{var _i=localStorage.getItem('rdg_intro');if(_i)intros=JSON.parse(_i);}catch(e){}
+function saveIntros(){try{localStorage.setItem('rdg_intro',JSON.stringify(intros));}catch(e){} applyIntros(); if(typeof cloudPush==='function')cloudPush();}
+var FOODS_BASE=null;
+function applyIntros(){
+ if(!FOODS_BASE)FOODS_BASE=FOODS.map(function(f){return f;});
+ FOODS_BASE.forEach(function(f){if(f._s0===undefined)f._s0=f.s;f.s=f._s0;f.trial=null;});
+ FOODS.length=0;FOODS_BASE.forEach(function(f){FOODS.push(f);});
+ intros.filter(function(t){return t.status!=='watching';}).forEach(function(t){
+  var s=t.status==='allowed'?'allowed':t.status==='ok'?'caution':'avoid';
+  var key=t.name.toLowerCase();
+  var match=FOODS.filter(function(f){var n=f.n.toLowerCase();return n===key||n.indexOf(key)===0||key.indexOf(n.split(' (')[0])===0;})[0];
+  if(match){match.s=s;match.trial=t;}
+  else{FOODS.push({n:t.name,c:'Tried',s:s,d:{gf:'ok',lh:s==='avoid'?'no':'caution',ls:'ok',g:'ok'},p:t.status==='reacted'?'She reacted when we tried it. See the Reactions log.':'Tried on purpose and she did fine.',t:t.notes||'',sh:s==='avoid'?'':'Other',trial:t});}
+ });
+ if(fcats.indexOf('Tried')<0&&FOODS.some(function(f){return f.c==='Tried';})){fcats.push('Tried');activeCats['Tried']=true;var el=document.getElementById('catPills');if(el&&el.children.length){el.innerHTML='';buildCatPills();}}
+}
+function trialDay(t){var d=Math.floor((new Date(today2())-new Date(t.start))/86400000)+1;return d<1?1:d;}
+function today2(){return new Date().toISOString().split('T')[0];}
+function startTrial(){
+ var inp=document.getElementById('trial-name'),n=inp.value.trim();
+ if(!n){toast('Type the food you are trying');return;}
+ var dt=document.getElementById('trial-date').value||today2();
+ intros.unshift({id:Date.now(),name:n,start:dt,status:'watching',end:'',notes:''});
+ inp.value='';saveIntros();renderTrials();toast('Watching '+n+' for 3 days');
+}
+function endTrial(id,result){
+ var t=intros.filter(function(x){return x.id===id;})[0];if(!t)return;
+ t.status=result;t.end=today2();saveIntros();renderTrials();renderFoods();
+ if(result==='reacted'){
+  document.getElementById('rx-name').value=t.name;
+  document.getElementById('rx-reason').value='Reacted during a new-food trial (started '+t.start+'). ';
+  document.getElementById('rx-reason').focus();
+  toast('Moved to Avoid. Add what happened and save.');
+ } else if(result==='ok') toast(t.name+' moved to Caution on the Foods tab');
+ else if(result==='allowed') toast(t.name+' moved to Allowed');
+}
+function undoTrial(id){var t=intros.filter(function(x){return x.id===id;})[0];if(!t)return;if(!confirm('Remove "'+t.name+'" from the trial history? Its Foods tab status goes back to normal.'))return;intros=intros.filter(function(x){return x.id!==id;});saveIntros();renderTrials();renderFoods();}
+function renderTrials(){
+ var el=document.getElementById('trialBox');if(!el)return;
+ var watching=intros.filter(function(t){return t.status==='watching';});
+ var done=intros.filter(function(t){return t.status!=='watching';});
+ var html='<div class="rxform"><h3>&#129514; Trying a new food</h3>'+
+  '<div style="font-size:12px;color:var(--t2);margin:-6px 0 10px;line-height:1.45">One new food at a time, then watch 3 days. Results update the Foods tab and the AI tools.</div>'+
+  '<div class="frow2"><div><label class="flbl">Food</label><input class="finp" id="trial-name" type="text" placeholder="e.g. peaches"/></div><div><label class="flbl">Started</label><input class="finp" id="trial-date" type="date" value="'+today2()+'"/></div></div>'+
+  '<button class="btn" onclick="startTrial()">Start watching</button></div>';
+ watching.forEach(function(t){
+  var day=trialDay(t);
+  html+='<div class="rxcard" style="border-color:var(--a)"><div class="rxch" style="cursor:default"><div class="rxci"><div class="rxcn">'+escH(t.name)+'</div><div class="rxcd">Started '+t.start+' &middot; '+(day>3?'3-day watch is up':'Day '+day+' of 3')+'</div></div></div>'+
+   '<div style="display:flex;gap:6px;padding:0 14px 12px"><button class="idea-btn hit" onclick="endTrial('+t.id+',\'ok\')">&#10003; She did fine</button><button class="idea-btn" style="border-color:var(--r);color:var(--rd)" onclick="endTrial('+t.id+',\'reacted\')">&#10007; Reacted</button><button class="idea-btn" onclick="undoTrial('+t.id+')">Cancel</button></div></div>';
+ });
+ if(done.length){
+  html+='<div class="sh">Tried so far ('+done.length+')</div>';
+  done.forEach(function(t){
+   var lbl=t.status==='allowed'?'<span class="bdg bok">Allowed</span>':t.status==='ok'?'<span class="bdg bca">Did fine</span>':'<span class="bdg bno">Reacted</span>';
+   html+='<div class="litem"><span class="lilbl">'+escH(t.name)+' <span style="font-size:11px;color:var(--t3)">'+t.start+'</span></span>'+lbl+
+    (t.status==='ok'?'<button class="sbx sbg" onclick="endTrial('+t.id+',\'allowed\')">Mark allowed</button>':'')+
+    '<button class="lidel" onclick="undoTrial('+t.id+')">&#10005;</button></div>';
+  });
+ }
+ el.innerHTML=html;
+}
+
 // ── CLOUD SYNC (Nov 2026) ───────────────────────────────
 // Shopping list, reactions log, saved items, Fresh Ideas hits and the
 // tired-of list are shared between both phones through Supabase (the same
@@ -1164,21 +1235,21 @@ function cloudRows(){
  return {
   diet_list:shopList.map(function(i){return {id:String(i.id),n:i.n,cat:i.cat,done:i.done?'1':''};}),
   diet_rx:reactions.map(function(r){return {id:String(r.id),name:r.name,reason:r.reason,date:r.date,cat:r.cat,sev:r.sev,notes:r.notes||''};}),
-  diet_kv:[{key:'fav',value:JSON.stringify(favorites)},{key:'gen',value:JSON.stringify(generatedRecipes)},{key:'tired',value:JSON.stringify(tiredOf)},{key:'hits',value:JSON.stringify(ideaHits)}]
+  diet_kv:[{key:'fav',value:JSON.stringify(favorites)},{key:'gen',value:JSON.stringify(generatedRecipes)},{key:'tired',value:JSON.stringify(tiredOf)},{key:'hits',value:JSON.stringify(ideaHits)},{key:'intro',value:JSON.stringify(intros)}]
  };
 }
 function rowId(t,r){return t==='diet_kv'?r.key:r.id;}
-function cacheLocal(){try{localStorage.setItem('rdg_fav',JSON.stringify(favorites));localStorage.setItem('rdg_lst',JSON.stringify(shopList));localStorage.setItem('rdg_rx',JSON.stringify(reactions));localStorage.setItem('rdg_gen',JSON.stringify(generatedRecipes));localStorage.setItem('rdg_tired',JSON.stringify(tiredOf));localStorage.setItem('rdg_hits',JSON.stringify(ideaHits));}catch(e){}}
+function cacheLocal(){try{localStorage.setItem('rdg_fav',JSON.stringify(favorites));localStorage.setItem('rdg_lst',JSON.stringify(shopList));localStorage.setItem('rdg_rx',JSON.stringify(reactions));localStorage.setItem('rdg_gen',JSON.stringify(generatedRecipes));localStorage.setItem('rdg_tired',JSON.stringify(tiredOf));localStorage.setItem('rdg_hits',JSON.stringify(ideaHits));localStorage.setItem('rdg_intro',JSON.stringify(intros));}catch(e){}}
 function applyCloud(data){
  shopList=data.diet_list.map(function(r){return {id:parseFloat(r.id),n:r.n,cat:r.cat||'Other',done:r.done==='1'};}).sort(function(a,b){return a.id-b.id;});
  reactions=data.diet_rx.map(function(r){return {id:parseFloat(r.id),name:r.name,reason:r.reason,date:r.date,cat:r.cat,sev:r.sev,notes:r.notes||''};}).sort(function(a,b){return b.id-a.id;});
- data.diet_kv.forEach(function(r){try{var v=JSON.parse(r.value);if(r.key==='fav')favorites=v;if(r.key==='gen')generatedRecipes=v;if(r.key==='tired')tiredOf=v;if(r.key==='hits')ideaHits=v;}catch(e){}});
+ data.diet_kv.forEach(function(r){try{var v=JSON.parse(r.value);if(r.key==='fav')favorites=v;if(r.key==='gen')generatedRecipes=v;if(r.key==='tired')tiredOf=v;if(r.key==='hits')ideaHits=v;if(r.key==='intro')intros=v;}catch(e){}});
 }
 function markCloudSynced(){var rows=cloudRows();Object.keys(rows).forEach(function(t){cloudSynced[t]={};rows[t].forEach(function(r){cloudSynced[t][rowId(t,r)]=JSON.stringify(r);});});}
 function refreshViews(){
- updateListBadge();updateRxBadge();
+ applyIntros();updateListBadge();updateRxBadge();
  var on=document.querySelector('.pg.on');if(!on)return;var pg=on.id.slice(3);
- if(pg==='foods')renderFoods();if(pg==='meals')renderMeals();if(pg==='list')renderList();if(pg==='rx')renderRx();if(pg==='favs')renderFavs();if(pg==='ideas'){renderTired();renderHits();}
+ if(pg==='foods')renderFoods();if(pg==='meals')renderMeals();if(pg==='list')renderList();if(pg==='rx'){renderTrials();renderRx();}if(pg==='favs')renderFavs();if(pg==='ideas'){renderTired();renderHits();}
 }
 async function cloudPull(){
  if(!sb)return;
@@ -1187,12 +1258,12 @@ async function cloudPull(){
   var out={};
   for(var t of ['diet_list','diet_rx','diet_kv']){var r=await sb.from(t).select('*');if(r.error)throw r.error;out[t]=r.data;}
   var cloudEmpty=!out.diet_list.length&&!out.diet_rx.length&&!out.diet_kv.length;
-  var localHas=shopList.length||reactions.length||favorites.foods.length||favorites.meals.length||generatedRecipes.length||ideaHits.length;
+  var localHas=intros.length||shopList.length||reactions.length||favorites.foods.length||favorites.meals.length||generatedRecipes.length||ideaHits.length;
   var firstTime=false;try{firstTime=localStorage.getItem('rdg_cloud1')!=='1';}catch(e){}
   if(firstTime){
    // First sync on this phone: keep everything this phone already had and add
    // what's in the cloud, so nobody's list or reactions log gets wiped.
-   var mine={list:shopList.slice(),rx:reactions.slice(),fav:JSON.parse(JSON.stringify(favorites)),gen:generatedRecipes.slice(),tired:tiredOf.slice(),hits:ideaHits.slice()};
+   var mine={intro:intros.slice(),list:shopList.slice(),rx:reactions.slice(),fav:JSON.parse(JSON.stringify(favorites)),gen:generatedRecipes.slice(),tired:tiredOf.slice(),hits:ideaHits.slice()};
    applyCloud(out);
    markCloudSynced();
    var byId=function(arr){var m={};arr.forEach(function(x){m[String(x.id)]=1;});return m;};
@@ -1203,6 +1274,7 @@ async function cloudPull(){
    have=byId(generatedRecipes);mine.gen.forEach(function(x){if(!have[String(x.id)])generatedRecipes.push(x);});
    have=byId(ideaHits);mine.hits.forEach(function(x){if(!have[String(x.id)])ideaHits.push(x);});
    mine.tired.forEach(function(t){if(tiredOf.indexOf(t)<0)tiredOf.push(t);});
+   have=byId(intros);mine.intro.forEach(function(x){if(!have[String(x.id)])intros.push(x);});
    try{localStorage.setItem('rdg_cloud1','1');}catch(e){}
    cloudReady=true;cacheLocal();refreshViews();cloudPush();
    if(cloudEmpty&&localHas)toast('Shared your lists with the cloud');
@@ -1242,6 +1314,7 @@ function cloudListen(){
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')cloudPull();});
 
 load();
+applyIntros();
 buildCatPills();
 buildListCats();
 renderFoods();
