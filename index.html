@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-title" content="Roper Diet Guide"/>
 <meta name="theme-color" content="#1D9E75"/>
 <title>Roper Diet Guide</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
 <style>
 :root{--g:#1D9E75;--gl:#E1F5EE;--gd:#085041;--a:#BA7517;--al:#FAEEDA;--ad:#633806;--r:#E24B4A;--rl:#FCEBEB;--rd:#791F1F;--b:#185FA5;--bl:#E6F1FB;--bd:#042C53;--bdr:#e0ddd6;--bg:#fff;--bg2:#f8f7f4;--tx:#1a1a18;--t2:#5a5956;--t3:#8a8885}
 @media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--bg2:#242422;--tx:#f0ede8;--t2:#a8a5a0;--t3:#6a6865;--bdr:#3a3835;--gl:#0a2e22;--al:#2a1e08;--rl:#2a1010;--bl:#0a1e30;--gd:#5DCAA5;--ad:#EF9F27;--rd:#F09595;--bd:#85B7EB}}
@@ -183,7 +186,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
  <div class="nav-i">
   <div class="brand">
    <div class="brand-t">&#127807; Roper Diet Guide</div>
-   <div class="brand-s">GF &middot; Low Sugar &middot; Low Histamine &middot; GAPS</div>
+   <div class="brand-s">GF &middot; Low Histamine &middot; Low Sugar &middot; GAPS</div>
   </div>
   <div class="tabs" id="mainTabs">
    <button class="tab on" onclick="goTab('foods',this)">Foods</button>
@@ -215,7 +218,7 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
   <div class="lgi"><div class="lgd" style="background:var(--g)"></div>Allowed</div>
   <div class="lgi"><div class="lgd" style="background:var(--a)"></div>Caution</div>
   <div class="lgi"><div class="lgd" style="background:var(--r)"></div>Avoid</div>
-  <div class="lgi" style="font-size:11px;color:var(--t3)">+List=shopping &nbsp; Log=reactions &nbsp; &#9829;=save</div>
+  <div class="lgi" style="font-size:11px;color:var(--t3)">GF &gt; LH &gt; LS &gt; GAPS &nbsp; +List=shopping &nbsp; Log=reactions &nbsp; &#9829;=save</div>
  </div>
  <div id="foodGrid"></div>
 </div>
@@ -375,10 +378,12 @@ var FOODS = [
  {n:"Lamb (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Fresh cuts. Excellent slow-cooked.",t:"Often very well tolerated. Naturally low histamine.",sh:"Meat & Seafood"},
  {n:"Turkey (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast or bake fresh. Avoid pre-basted birds.",t:"Good variety protein.",sh:"Meat & Seafood"},
  {n:"Pork (fresh)",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Fresh only. Plain roast or chops. Never cured or smoked.",t:"Slightly higher histamine than lamb or beef.",sh:"Meat & Seafood"},
- {n:"Eggs (fresh)",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Our family avoids eggs in all forms, including whites, yolks, and eggs baked into foods.",t:"Egg whites are a common histamine liberator.",sh:"Dairy & Eggs"},
- {n:"Wild-caught fish (fresh)",c:"Proteins",s:"allowed",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Very fresh only, cook same day. Never canned, smoked or dried.",t:"Histamine rises extremely fast in fish.",sh:"Meat & Seafood"},
+ {n:"Eggs cooked into food",c:"Proteins",s:"allowed",d:{gf:"ok",lh:"caution",ls:"ok",g:"ok"},p:"Fine as an ingredient: pancakes, muffins, biscuits, or a binder in meatballs and patties. Cook all the way through.",t:"Riley does fine with eggs baked or cooked into foods.",sh:"Dairy & Eggs"},
+ {n:"Egg dishes (omelet, quiche, frittata)",c:"Proteins",s:"avoid",d:{gf:"ok",lh:"no",ls:"ok",g:"ok"},p:"No omelets, quiche or frittatas, and treat scrambled, fried, boiled and soft eggs the same way. No raw yolks.",t:"When eggs are the main thing on the plate, that's where trouble shows up. Egg whites are a histamine liberator.",sh:""},
+ {n:"Leftovers (cooked meat & meals)",c:"Proteins",s:"avoid",d:{gf:"ok",lh:"no",ls:"ok",g:"ok"},p:"Cook fresh and eat it. Freeze extra portions right away, never the next day.",t:"Histamine climbs in cooked food sitting in the fridge, even overnight. A hard no for Riley.",sh:""},
+ {n:"Wild-caught fish (fresh)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Very fresh only, cook same day. Never canned, smoked or dried.",t:"Histamine rises extremely fast in fish.",sh:"Meat & Seafood"},
  {n:"Canned fish / deli meats",c:"Proteins",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid entirely.",t:"High histamine, often gluten-containing, nitrates and added sugars.",sh:""},
- {n:"Bone broth (short-cook)",c:"Proteins",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Simmer fresh bones under 3 hours. Use as cooking liquid or warm drink.",t:"Short-cook keeps histamine lower. Long-simmered broth raises histamine significantly.",sh:"Meat & Seafood"},
+ {n:"Bone broth (short-cook)",c:"Proteins",s:"caution",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Simmer fresh bones under 3 hours. Use as cooking liquid or warm drink.",t:"Short-cook keeps histamine lower. Long-simmered broth raises histamine significantly.",sh:"Meat & Seafood"},
  {n:"Butternut squash",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Roast or steam. Puree for small children.",t:"Gentle and nutrient-dense. One of the best tolerated foods.",sh:"Produce"},
  {n:"Zucchini",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steam, saute in ghee, or add to soups.",t:"GAPS intro staple. Low histamine.",sh:"Produce"},
  {n:"Carrots",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Boil or steam until very soft. Puree well.",t:"One of the best GAPS intro vegetables.",sh:"Produce"},
@@ -393,7 +398,7 @@ var FOODS = [
  {n:"Tomatoes",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"caution",lh:"no",g:"caution"},p:"Avoid in all forms.",t:"High histamine trigger.",sh:""},
  {n:"Avocado",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"ok"},p:"Avoid despite nutrition.",t:"High histamine.",sh:""},
  {n:"Eggplant",c:"Vegetables",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"ok"},p:"Avoid.",t:"Very high histamine.",sh:""},
- {n:"Sweet potato",c:"Vegetables",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"Not GAPS intro. Small amounts in full GAPS only.",t:"Excluded from GAPS intro. Moderate sugar.",sh:"Produce"},
+ {n:"Sweet potato",c:"Vegetables",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"Not GAPS intro. Small amounts in full GAPS only.",t:"Excluded from GAPS intro. Moderate sugar.",sh:"Produce"},
  {n:"Blueberries",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Fresh only. Small amounts as occasional treat.",t:"Lower sugar fruit. After GAPS intro.",sh:"Produce"},
  {n:"Pears",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Ripe, peeled, small portions or lightly stewed.",t:"Gentle and usually well tolerated.",sh:"Produce"},
  {n:"Apples (cooked)",c:"Fruits",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Stew or bake without sugar.",t:"Unsweetened stewed apple is a GAPS option.",sh:"Produce"},
@@ -403,15 +408,16 @@ var FOODS = [
  {n:"Ghee (clarified butter)",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Primary cooking fat. Make at home or buy grass-fed quality.",t:"Casein-free, lactose-free. Cornerstone GAPS fat.",sh:"Dairy & Eggs"},
  {n:"Coconut oil (unrefined)",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Good for cooking and baking. Virgin/unrefined.",t:"Antimicrobial. Great GAPS fat.",sh:"Oils & Condiments"},
  {n:"Olive oil (extra virgin)",c:"Fats & Oils",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Cold use or very low heat only.",t:"Do not cook at high temperature.",sh:"Oils & Condiments"},
- {n:"Coconut milk (full-fat)",c:"Fats & Oils",s:"avoid",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Label must say only coconut and water. No guar gum ideally.",t:"Check label every time.",sh:"Baking"},
+ {n:"Coconut milk (full-fat)",c:"Fats & Oils",s:"caution",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Label must say only coconut and water. No guar gum ideally.",t:"Check label every time.",sh:"Baking"},
  {n:"Vegetable / seed oils",c:"Fats & Oils",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"no"},p:"Avoid canola, sunflower, soy, corn oil.",t:"Not GAPS-approved.",sh:""},
  {n:"GAPS yogurt (24hr homemade)",c:"Dairy",s:"avoid",d:{gf:"ok",ls:"ok",lh:"caution",g:"ok"},p:"Ferment full-fat milk 24 hours. Start with 1 tsp and build slowly.",t:"Core GAPS food but fermentation raises histamine. Introduce very slowly.",sh:"Dairy & Eggs"},
- {n:"Fresh butter (unsalted)",c:"Dairy",s:"avoid",d:{gf:"ok",ls:"ok",lh:"ok",g:"caution"},p:"Unsalted, grass-fed. Some prefer to start with ghee only.",t:"Introduces casein, watch for dairy sensitivity.",sh:"Dairy & Eggs"},
+ {n:"Fresh butter (unsalted)",c:"Dairy",s:"caution",d:{gf:"ok",ls:"ok",lh:"ok",g:"caution"},p:"Unsalted, grass-fed, or churned from your own raw or goat milk. Some prefer to start with ghee only.",t:"Introduces casein; watch how she does.",sh:"Dairy & Eggs"},
+ {n:"Raw milk & goat milk",c:"Dairy",s:"allowed",d:{gf:"ok",lh:"ok",ls:"ok",g:"caution"},p:"Fresh raw cow milk or goat milk. Chill fast, keep cold, use within a few days.",t:"Riley does well on raw and goat milk. Processed store milk is where problems show up.",sh:"Dairy & Eggs"},
  {n:"Aged cheeses",c:"Dairy",s:"avoid",d:{gf:"ok",ls:"ok",lh:"no",g:"caution"},p:"Avoid all aged cheeses.",t:"Very high histamine.",sh:""},
  {n:"Store-bought yogurt",c:"Dairy",s:"avoid",d:{gf:"caution",ls:"no",lh:"no",g:"no"},p:"Avoid. Must be homemade for GAPS.",t:"Added sugars, insufficient fermentation.",sh:""},
  {n:"Almond flour (blanched)",c:"Baking",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Key GAPS baking flour. Blanched preferred.",t:"Grain-free, gluten-free GAPS staple.",sh:"Baking"},
  {n:"Coconut flour",c:"Baking",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Very absorbent, use far less. Best combined with almond flour.",t:"GAPS approved. High fiber.",sh:"Baking"},
- {n:"Raw honey",c:"Baking",s:"allowed",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Tiny amounts only. Never heat. Not for children under 2.",t:"Allowed in GAPS in very small amounts.",sh:"Baking"},
+ {n:"Raw honey",c:"Baking",s:"caution",d:{gf:"ok",ls:"caution",lh:"ok",g:"ok"},p:"Tiny amounts only. Never heat. Not for children under 2.",t:"Allowed in GAPS in very small amounts.",sh:"Baking"},
  {n:"Wheat / gluten flours",c:"Baking",s:"avoid",d:{gf:"no",ls:"ok",lh:"ok",g:"no"},p:"Avoid entirely.",t:"Excluded by GAPS and gluten-free requirement.",sh:""},
  {n:"Rice / oats (even GF)",c:"Baking",s:"avoid",d:{gf:"ok",ls:"caution",lh:"ok",g:"no"},p:"GAPS excludes all grains.",t:"All grains excluded on GAPS.",sh:""},
  {n:"Refined sugars / syrups",c:"Baking",s:"avoid",d:{gf:"ok",ls:"no",lh:"ok",g:"no"},p:"Avoid all. Sugar, maple syrup, agave, corn syrup.",t:"Excluded from GAPS and low sugar diet.",sh:""},
@@ -420,40 +426,40 @@ var FOODS = [
  {n:"Peppermint tea",c:"Drinks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Brew light. Dilute for young children.",t:"Supports digestion.",sh:"Beverages"},
  {n:"Ginger tea (fresh)",c:"Drinks",s:"allowed",d:{gf:"ok",ls:"ok",lh:"ok",g:"ok"},p:"Steep fresh ginger slices in hot water. Cool well before serving.",t:"Anti-inflammatory and digestive support.",sh:"Beverages"},
  {n:"Fruit juices",c:"Drinks",s:"avoid",d:{gf:"ok",ls:"no",lh:"caution",g:"no"},p:"Avoid all juices.",t:"Very high sugar. Not GAPS-approved.",sh:""},
- {n:"Cow milk / plant milks",c:"Drinks",s:"avoid",d:{gf:"caution",ls:"caution",lh:"ok",g:"no"},p:"Avoid. Not GAPS protocol.",t:"Not suitable for GAPS diet.",sh:""}
+ {n:"Store-bought (processed) milk",c:"Drinks",s:"avoid",d:{gf:"ok",lh:"caution",ls:"caution",g:"no"},p:"Skip pasteurized grocery milk, including 2%. Use raw or goat milk instead.",t:"Processed milk is where Riley's issues come from.",sh:""},
+ {n:"Plant milks (almond, oat, etc.)",c:"Drinks",s:"avoid",d:{gf:"caution",lh:"caution",ls:"caution",g:"no"},p:"Avoid. Most have gums, added sugar, or oats.",t:"Use raw or goat milk instead.",sh:""},
+ {n:"Untried high-histamine foods",c:"Other",s:"avoid",d:{gf:"ok",lh:"no",ls:"ok",g:"ok"},p:"Anything high-histamine she hasn't been introduced to yet is a no for now.",t:"New foods get introduced on purpose, one at a time, then moved to Caution or Allowed here.",sh:""}
 ];
 
 // ── MEALS DATA ──────────────────────────────────────────
 var MEALS = [
- {n:"Soft scrambled eggs with ghee",tab:"breakfast",t:"5 min",d:"Low-and-slow for maximum digestibility.",i:["2-3 fresh eggs","1 tbsp ghee","Pinch sea salt"],s:["Crack eggs into cold pan with ghee.","Heat to low. Stir slowly and constantly.","Remove while still slightly wet. Season and serve."],nt:"Never brown or overcook.",sh:["Fresh eggs","Ghee"]},
  {n:"GAPS almond flour pancakes",tab:"breakfast",t:"15 min",d:"Grain-free pancakes the whole family can enjoy.",i:["1 cup blanched almond flour","2 fresh eggs","2 tbsp melted ghee","Pinch sea salt","1/2 tsp baking soda","Tiny raw honey (optional, age 2+)"],s:["Whisk eggs with ghee and honey.","Stir in almond flour, salt, baking soda.","Cook small pancakes in ghee over medium-low heat.","2-3 min per side. Serve immediately."],nt:"Top with stewed apple or blueberries. Never maple syrup.",sh:["Blanched almond flour","Fresh eggs","Ghee","Baking soda","Raw honey"]},
- {n:"Butternut squash and egg porridge",tab:"breakfast",t:"20 min",d:"Creamy, warm and nourishing. A key GAPS intro breakfast.",i:["1/2 cup butternut squash steamed and mashed","1 fresh egg yolk","1 tsp ghee","Pinch sea salt"],s:["Steam squash until very soft. Mash smooth.","Add ghee and salt. Cool to warm not hot.","Stir in raw egg yolk just before serving."],nt:"Raw egg yolk is a GAPS intro food. Use very fresh eggs only.",sh:["Butternut squash","Fresh eggs","Ghee"]},
+ {n:"Turkey sage breakfast patties",tab:"breakfast",t:"15 min",d:"Savory little patties, cooked fresh. Make a big batch raw and freeze them uncooked.",i:["250g fresh ground turkey","1/2 tsp dried sage","Pinch dried thyme","1/4 tsp sea salt","1 tbsp ghee"],s:["Mix turkey, sage, thyme and salt. Form small thin patties.","Cook in ghee over medium heat 3-4 min per side until cooked through.","Serve right away."],nt:"Freeze extra patties RAW on a tray, then bag. Cook from frozen, never keep cooked ones.",sh:["Fresh ground turkey","Dried sage","Ghee"]},
  {n:"Baked apple with cinnamon",tab:"breakfast",t:"25 min",d:"Naturally sweet, warming, zero added sugar.",i:["1 apple cored and peeled","1/4 tsp cinnamon","1 tsp ghee","1 tbsp water"],s:["Preheat oven to 350F/175C.","Place apple in dish with water. Add ghee and cinnamon.","Bake 20-25 min until very soft. Mash if needed."],nt:"Can also stew on stovetop for 10 min.",sh:["Apples","Ghee","Cinnamon"]},
  {n:"Coconut flour mini muffins",tab:"breakfast",t:"25 min",d:"A batch of small moist muffins for the whole family.",i:["1/2 cup coconut flour","4 fresh eggs","1/4 cup melted ghee","2 tbsp raw honey","1/2 tsp baking soda","Pinch sea salt","Optional: a few blueberries"],s:["Preheat oven to 350F/175C. Grease mini muffin tin.","Whisk eggs, ghee and honey.","Stir in coconut flour, baking soda and salt. Rest 2 min.","Fill cups 3/4 full. Press blueberry into each if desired.","Bake 12-15 min until toothpick comes out clean. Cool completely."],nt:"Coconut flour is very absorbent. Do not substitute 1:1 with almond flour.",sh:["Coconut flour","Fresh eggs","Ghee","Raw honey","Baking soda","Blueberries"]},
  {n:"Turkey and vegetable breakfast bowl",tab:"breakfast",t:"15 min",d:"A savory breakfast with ground turkey and soft vegetables.",i:["100g fresh ground turkey","1/2 zucchini finely diced","1 small carrot grated","1/2 small onion diced","1 tbsp ghee","Sea salt"],s:["Melt ghee. Saute onion 3 min.","Add carrot and zucchini. Cook 3 min.","Add ground turkey. Cook through. Season with sea salt."],nt:"Great savory breakfast for the whole family.",sh:["Fresh ground turkey","Zucchini","Carrots","Onion","Ghee"]},
  {n:"Stewed pear and blueberry bowl",tab:"breakfast",t:"15 min",d:"Gently stewed fruit as a light breakfast.",i:["1 ripe pear peeled and diced","Small handful fresh blueberries","2 tbsp filtered water","Pinch cinnamon"],s:["Simmer pear and water with cinnamon 8 min until soft.","Add blueberries last 2 min. Serve warm."],nt:"Naturally sweet with no added sugar.",sh:["Ripe pears","Blueberries","Cinnamon"]},
  {n:"Almond butter stuffed apple",tab:"breakfast",t:"10 min",d:"A simple whole-food breakfast that travels well.",i:["1 apple cored","2 tbsp natural almond butter (100% almonds only)","Pinch cinnamon"],s:["Core and peel apple. Slice into rounds for young children.","Serve with almond butter for dipping. Dust with cinnamon."],nt:"Label must say 100% almonds only. No salt, oil or sugar added.",sh:["Apples","Natural almond butter (100% almonds)"]},
- {n:"Egg and vegetable frittata",tab:"breakfast",t:"20 min",d:"A hearty baked egg dish for a shared family breakfast.",i:["4 fresh eggs","1 cup mixed soft vegetables steamed and chopped","1/2 onion diced","1 tbsp ghee","Pinch sea salt"],s:["Preheat oven to 375F/190C.","Saute onion in ghee in oven-safe pan. Add vegetables.","Whisk eggs with salt. Pour over. Cook on stovetop 2 min.","Transfer to oven. Bake 10-12 min until set. Slice and serve."],nt:"Eat same day. Do not reheat leftover egg dishes.",sh:["Fresh eggs","Zucchini","Broccoli","Onion","Ghee"]},
- {n:"Chicken vegetable soup",tab:"lunch",t:"60 min",d:"The go-to nourishing soup safe across all four diets.",i:["Bone-in chicken thighs fresh","2 carrots sliced","2 zucchini sliced","1 onion","3 garlic cloves","Filtered water","Sea salt","Fresh parsley"],s:["Place chicken and onion in pot. Cover with cold water.","Bring to boil. Skim foam.","Add carrots and garlic. Simmer 60-90 min.","Add zucchini last 15 min. Shred chicken. Return meat. Season."],nt:"Refrigerate within 1 hour. Use within 24 hours.",sh:["Fresh chicken thighs","Carrots","Zucchini","Onion","Garlic","Fresh parsley"]},
+ {n:"Chicken vegetable soup",tab:"lunch",t:"60 min",d:"The go-to nourishing soup safe across all four diets.",i:["Bone-in chicken thighs fresh","2 carrots sliced","2 zucchini sliced","1 onion","3 garlic cloves","Filtered water","Sea salt","Fresh parsley"],s:["Place chicken and onion in pot. Cover with cold water.","Bring to boil. Skim foam.","Add carrots and garlic. Simmer 60-90 min.","Add zucchini last 15 min. Shred chicken. Return meat. Season."],nt:"Eat fresh. Freeze extra portions right away; no fridge leftovers for Riley.",sh:["Fresh chicken thighs","Carrots","Zucchini","Onion","Garlic","Fresh parsley"]},
  {n:"Butternut squash soup",tab:"lunch",t:"35 min",d:"Smooth, sweet and soothing. Excellent for batch cooking.",i:["1 medium butternut squash cubed","1 onion diced","2 garlic cloves","2 cups water or short-cook broth","2 tbsp ghee","Sea salt"],s:["Melt ghee. Saute onion and garlic 5 min.","Add squash and liquid. Boil then simmer 20 min.","Blend smooth. Season."],nt:"Freezes well in individual portions.",sh:["Butternut squash","Onion","Garlic","Ghee"]},
  {n:"Zucchini noodles with meat sauce",tab:"lunch",t:"25 min",d:"A pasta-free noodle bowl that children often love.",i:["2 zucchini spiralized or ribboned","200g fresh ground beef or lamb","1 onion finely diced","2 garlic cloves","2 tbsp ghee","Sea salt","Fresh herbs"],s:["Saute onion and garlic in 1 tbsp ghee 5 min.","Add ground meat. Cook through. Season.","Separately saute zucchini in remaining ghee 2-3 min.","Serve meat over zucchini noodles."],nt:"No tomato sauce. High histamine. Savory meat and ghee are enough.",sh:["Zucchini","Fresh ground beef or lamb","Onion","Garlic","Ghee"]},
  {n:"Carrot and ginger soup",tab:"lunch",t:"30 min",d:"Warming with fresh ginger for digestive support.",i:["4 large carrots sliced","1 onion diced","1 tsp fresh ginger grated","2 garlic cloves","2 tbsp ghee","2 cups water or broth","Sea salt"],s:["Saute onion, garlic and ginger in ghee 5 min.","Add carrots and liquid. Boil then simmer 20 min.","Blend smooth. Season."],nt:"Fresh ginger only.",sh:["Carrots","Onion","Fresh ginger root","Garlic","Ghee"]},
- {n:"Chicken lettuce wraps",tab:"lunch",t:"20 min",d:"A fun hands-on lunch using butter lettuce as wraps.",i:["150g freshly cooked chicken shredded (within 24hr)","1 carrot grated","1/2 cucumber diced","Butter lettuce leaves","1 tbsp olive oil","Pinch sea salt"],s:["Mix chicken, carrot, cucumber, olive oil and salt.","Spoon into butter lettuce leaves. Serve immediately."],nt:"Only use chicken cooked within the past 24 hours.",sh:["Fresh chicken","Carrots","Cucumber","Butter lettuce"]},
+ {n:"Chicken zucchini patties",tab:"lunch",t:"25 min",d:"Soft, mild patties with veggies hidden inside. The egg just holds them together.",i:["300g fresh ground chicken","1 small zucchini grated and squeezed dry","1 small carrot grated","1 egg","2 tbsp coconut flour","Sea salt","1 tbsp ghee"],s:["Mix everything except ghee. Rest 2 min so the coconut flour soaks up moisture.","Form small patties.","Cook in ghee over medium heat 4 min per side until cooked through."],nt:"Eat fresh. Freeze extra patties raw.",sh:["Fresh ground chicken","Zucchini","Carrots","Coconut flour","Fresh eggs","Ghee"]},
+ {n:"Chicken lettuce wraps",tab:"lunch",t:"20 min",d:"A fun hands-on lunch using butter lettuce as wraps.",i:["150g chicken, cooked right before and shredded","1 carrot grated","1/2 cucumber diced","Butter lettuce leaves","1 tbsp olive oil","Pinch sea salt"],s:["Mix chicken, carrot, cucumber, olive oil and salt.","Spoon into butter lettuce leaves. Serve immediately."],nt:"Cook the chicken right before. No leftover chicken for Riley.",sh:["Fresh chicken","Carrots","Cucumber","Butter lettuce"]},
  {n:"Cauliflower rice with ground lamb",tab:"lunch",t:"25 min",d:"A satisfying grain-free bowl.",i:["1 small head cauliflower grated into rice","200g fresh ground lamb","1 onion finely diced","2 garlic cloves minced","2 tbsp ghee","Sea salt","Fresh mint or parsley"],s:["Pulse cauliflower to rice-sized pieces.","Saute onion and garlic in 1 tbsp ghee. Add lamb. Cook through. Season. Set aside.","In same pan cook cauliflower rice in remaining ghee 5-6 min.","Combine with lamb. Top with fresh herbs."],nt:"Cauliflower rice is a great GAPS grain substitute.",sh:["Cauliflower","Fresh ground lamb","Onion","Garlic","Ghee","Fresh mint"]},
- {n:"Broccoli and egg frittata",tab:"lunch",t:"25 min",d:"A hearty egg-based lunch that slices well.",i:["4 fresh eggs","1 cup broccoli steamed and chopped","1/2 onion diced","1 tbsp ghee","Pinch sea salt"],s:["Preheat oven to 375F/190C. Saute onion in ghee in oven-safe pan.","Add broccoli. Whisk eggs with salt. Pour over.","Cook on stovetop 2 min then bake 10-12 min until set."],nt:"Eat same day.",sh:["Fresh eggs","Broccoli","Onion","Ghee"]},
- {n:"Roasted vegetable and chicken bowl",tab:"lunch",t:"40 min",d:"Simple and adaptable with whatever vegetables you have.",i:["150g fresh chicken","Butternut squash cubed","Zucchini sliced","Carrots sliced","2 tbsp melted ghee","Sea salt","Fresh rosemary"],s:["Preheat oven to 400F/200C.","Toss vegetables with half the ghee and salt.","Brush chicken with remaining ghee. Place on same sheet.","Roast 30-35 min. Slice chicken over vegetables."],nt:"Use within 24 hours.",sh:["Fresh chicken","Butternut squash","Zucchini","Carrots","Ghee"]},
- {n:"Lamb meatball soup",tab:"lunch",t:"45 min",d:"Small lamb meatballs in gentle vegetable broth. Fun for children.",i:["300g fresh ground lamb","1 egg","Pinch sea salt","Pinch dried thyme","2 carrots sliced","1 zucchini sliced","1 onion diced","2 garlic cloves","4 cups filtered water"],s:["Combine lamb, egg, salt and thyme. Roll into small balls.","Simmer onion and garlic in water 10 min.","Add carrots. Simmer 10 min.","Add meatballs gently. Simmer 12-15 min until cooked through.","Add zucchini last 5 min. Season."],nt:"Refrigerate quickly. Use within 24 hours.",sh:["Fresh ground lamb","Fresh eggs","Carrots","Zucchini","Onion","Garlic"]},
- {n:"Baked chicken with roasted vegetables",tab:"dinner",t:"55 min",d:"The family staple. Simple, reliable and endlessly repeatable.",i:["Chicken thighs or drumsticks fresh skin-on","Butternut squash cubed","Cauliflower florets","Carrots sliced thick","2 tbsp melted ghee","Sea salt","Fresh thyme"],s:["Preheat oven to 400F/200C.","Toss vegetables with ghee and salt in roasting pan.","Place chicken on top. Roast 40-45 min until skin is golden.","Rest 5 min. Cut into small pieces for young children."],nt:"Make double and use chicken in soup next day within 24 hours.",sh:["Fresh chicken thighs","Butternut squash","Cauliflower","Carrots","Ghee","Fresh thyme"]},
+ {n:"Roasted vegetable and chicken bowl",tab:"lunch",t:"40 min",d:"Simple and adaptable with whatever vegetables you have.",i:["150g fresh chicken","Butternut squash cubed","Zucchini sliced","Carrots sliced","2 tbsp melted ghee","Sea salt","Fresh rosemary"],s:["Preheat oven to 400F/200C.","Toss vegetables with half the ghee and salt.","Brush chicken with remaining ghee. Place on same sheet.","Roast 30-35 min. Slice chicken over vegetables."],nt:"Eat fresh. Freeze extras right away.",sh:["Fresh chicken","Butternut squash","Zucchini","Carrots","Ghee"]},
+ {n:"Lamb meatball soup",tab:"lunch",t:"45 min",d:"Small lamb meatballs in gentle vegetable broth. Fun for children.",i:["300g fresh ground lamb","1 egg","Pinch sea salt","Pinch dried thyme","2 carrots sliced","1 zucchini sliced","1 onion diced","2 garlic cloves","4 cups filtered water"],s:["Combine lamb, egg, salt and thyme. Roll into small balls.","Simmer onion and garlic in water 10 min.","Add carrots. Simmer 10 min.","Add meatballs gently. Simmer 12-15 min until cooked through.","Add zucchini last 5 min. Season."],nt:"Eat fresh. Freeze extra meatballs raw.",sh:["Fresh ground lamb","Fresh eggs","Carrots","Zucchini","Onion","Garlic"]},
+ {n:"Baked chicken with roasted vegetables",tab:"dinner",t:"55 min",d:"The family staple. Simple, reliable and endlessly repeatable.",i:["Chicken thighs or drumsticks fresh skin-on","Butternut squash cubed","Cauliflower florets","Carrots sliced thick","2 tbsp melted ghee","Sea salt","Fresh thyme"],s:["Preheat oven to 400F/200C.","Toss vegetables with ghee and salt in roasting pan.","Place chicken on top. Roast 40-45 min until skin is golden.","Rest 5 min. Cut into small pieces for young children."],nt:"Make double and freeze the extra chicken right away for a future soup night.",sh:["Fresh chicken thighs","Butternut squash","Cauliflower","Carrots","Ghee","Fresh thyme"]},
  {n:"Slow-cooked lamb stew",tab:"dinner",t:"2.5 hrs",d:"Rich and tender. Lamb is naturally low in histamine.",i:["500g fresh lamb shoulder cubed","2 carrots sliced","1 zucchini","1 onion diced","3 garlic cloves","1 cup filtered water","2 tbsp ghee","Sea salt","Fresh rosemary"],s:["Brown lamb in ghee in batches. Set aside.","Saute onion and garlic. Return lamb. Add carrots, liquid and herbs.","Simmer covered very low 1.5-2 hours.","Add zucchini last 20 min. Season."],nt:"Cook fresh and eat same day.",sh:["Fresh lamb shoulder","Carrots","Zucchini","Onion","Garlic","Ghee"]},
  {n:"Ground beef and cauliflower bake",tab:"dinner",t:"40 min",d:"A hearty casserole-style dinner with no grains.",i:["300g fresh ground beef","1 head cauliflower in florets","1 onion diced","2 garlic cloves","2 tbsp ghee","Sea salt","Fresh parsley"],s:["Preheat oven to 375F/190C.","Saute onion and garlic. Add beef. Cook through. Season.","Steam cauliflower 5 min. Layer in baking dish.","Top with meat. Dot with ghee. Bake 20 min. Top with parsley."],nt:"",sh:["Fresh ground beef","Cauliflower","Onion","Garlic","Ghee","Fresh parsley"]},
  {n:"Poached fish with steamed vegetables",tab:"dinner",t:"20 min",d:"Light and clean. Must use very fresh fish purchased that day.",i:["Fresh white fish fillet cod or sole","2 zucchini sliced","1 carrot sliced","1 cup filtered water","1 tbsp ghee","Sea salt","Fresh dill or parsley"],s:["Bring water to gentle simmer. Poach fish 6-8 min until opaque.","Steam zucchini and carrot until tender.","Serve fish over vegetables with ghee and herbs."],nt:"Fish must be purchased and cooked same day.",sh:["Fresh white fish","Zucchini","Carrots","Ghee","Fresh dill"]},
- {n:"Roast turkey breast with herbs",tab:"dinner",t:"75 min",d:"A fresh alternative to chicken. Great Sunday dinner.",i:["Turkey breast fresh skin-on","2 tbsp ghee","Sea salt","Fresh thyme and rosemary","1 onion quartered","3 garlic cloves"],s:["Preheat oven to 375F/190C.","Rub turkey with ghee, salt and herbs.","Place onion and garlic in roasting pan. Set turkey on top.","Roast 60-70 min to 165F/74C internal temp. Rest 10 min."],nt:"Use within 24 hours. Freeze remaining portions immediately.",sh:["Fresh turkey breast","Ghee","Fresh thyme","Fresh rosemary","Onion","Garlic"]},
+ {n:"Roast turkey breast with herbs",tab:"dinner",t:"75 min",d:"A fresh alternative to chicken. Great Sunday dinner.",i:["Turkey breast fresh skin-on","2 tbsp ghee","Sea salt","Fresh thyme and rosemary","1 onion quartered","3 garlic cloves"],s:["Preheat oven to 375F/190C.","Rub turkey with ghee, salt and herbs.","Place onion and garlic in roasting pan. Set turkey on top.","Roast 60-70 min to 165F/74C internal temp. Rest 10 min."],nt:"Freeze remaining portions immediately.",sh:["Fresh turkey breast","Ghee","Fresh thyme","Fresh rosemary","Onion","Garlic"]},
  {n:"Chicken and cauliflower cream soup",tab:"dinner",t:"40 min",d:"A creamy velvety dinner soup.",i:["2 chicken thighs fresh bone-in","1 small head cauliflower chopped","1 onion diced","3 garlic cloves","2 cups filtered water","2 tbsp ghee","Sea salt","Fresh chives"],s:["Poach chicken thighs in water 25 min. Remove and shred. Reserve liquid.","Saute onion and garlic in ghee until soft.","Add cauliflower and poaching liquid. Simmer 15 min.","Blend most of soup smooth. Return chicken. Season. Top with chives."],nt:"",sh:["Fresh chicken thighs","Cauliflower","Onion","Garlic","Ghee"]},
- {n:"Lamb and vegetable patties",tab:"dinner",t:"25 min",d:"Small patties that are fun for kids.",i:["300g fresh ground lamb","1/2 zucchini grated and squeezed dry","1 small carrot grated","1/2 small onion grated","1 egg","Sea salt","1 tbsp ghee for cooking"],s:["Combine all except ghee. Form into small patties.","Heat ghee over medium. Cook patties 3-4 min each side.","Serve with steamed vegetables."],nt:"Make and eat same day.",sh:["Fresh ground lamb","Zucchini","Carrots","Onion","Fresh eggs","Ghee"]},
+ {n:"Lamb and vegetable patties",tab:"dinner",t:"25 min",d:"Small patties that are fun for kids.",i:["300g fresh ground lamb","1/2 zucchini grated and squeezed dry","1 small carrot grated","1/2 small onion grated","1 egg","Sea salt","1 tbsp ghee for cooking"],s:["Combine all except ghee. Form into small patties.","Heat ghee over medium. Cook patties 3-4 min each side.","Serve with steamed vegetables."],nt:"Make and eat same day. Freeze extra patties raw.",sh:["Fresh ground lamb","Zucchini","Carrots","Onion","Fresh eggs","Ghee"]},
  {n:"Beef and broccoli pan",tab:"dinner",t:"20 min",d:"Quick weeknight dinner. No soy sauce needed.",i:["250g fresh beef sirloin thinly sliced","2 cups broccoli florets","1 onion sliced","2 garlic cloves","2 tbsp ghee","Sea salt","Fresh ginger grated"],s:["Heat ghee over high. Sear beef in batches. Remove.","Add onion and garlic. Stir-fry 3 min.","Add broccoli and a splash of water. Cover 3 min.","Return beef. Toss. Season."],nt:"No soy sauce. Contains gluten and is high histamine.",sh:["Fresh beef sirloin","Broccoli","Onion","Garlic","Ghee"]},
  {n:"Stuffed zucchini boats",tab:"dinner",t:"40 min",d:"A fun presentation. Hollowed zucchini filled with savory meat.",i:["2 large zucchini","200g fresh ground beef or turkey","1 small onion finely diced","2 garlic cloves","1 tbsp ghee","Sea salt","Fresh parsley"],s:["Preheat oven to 375F/190C.","Halve zucchini lengthwise. Scoop out center and chop.","Saute onion, garlic and zucchini flesh. Add meat. Cook through. Season.","Fill zucchini shells. Place in baking dish.","Bake 20-25 min until shells are tender. Top with parsley."],nt:"",sh:["Large zucchini","Fresh ground beef or turkey","Onion","Garlic","Ghee","Fresh parsley"]},
- {n:"Stewed pears with cinnamon",tab:"snacks",t:"15 min",d:"Gentle, naturally sweet and soothing.",i:["2 ripe pears peeled","1/2 cup filtered water","Pinch cinnamon"],s:["Cube pears. Simmer with water and cinnamon 10 min.","Mash or serve in chunks."],nt:"Store max 2 days refrigerated.",sh:["Ripe pears","Cinnamon"]},
- {n:"Soft-boiled egg",tab:"snacks",t:"8 min",d:"Simple protein-rich snack.",i:["1-2 fresh eggs","Pinch sea salt"],s:["Boil water. Lower eggs. Cook exactly 6-7 min.","Transfer to cold water 1 min. Peel and season."],nt:"Serve fresh. Do not refrigerate peeled boiled eggs.",sh:["Fresh eggs"]},
+ {n:"Stewed pears with cinnamon",tab:"snacks",t:"15 min",d:"Gentle, naturally sweet and soothing.",i:["2 ripe pears peeled","1/2 cup filtered water","Pinch cinnamon"],s:["Cube pears. Simmer with water and cinnamon 10 min.","Mash or serve in chunks."],nt:"Best fresh. Freeze extra in small portions.",sh:["Ripe pears","Cinnamon"]},
+ {n:"Goat milk pear pops",tab:"snacks",t:"10 min + freezing",d:"Creamy frozen pops from your own goat milk. Great on hot days.",i:["1 cup fresh goat milk (or raw milk)","1 very ripe pear peeled","Pinch cinnamon","Optional: 1/2 tsp raw honey"],s:["Blend everything smooth.","Pour into pop molds or small cups.","Freeze 4+ hours."],nt:"Freezing right away keeps histamine from building.",sh:["Fresh goat milk","Ripe pears","Cinnamon"]},
  {n:"Blueberries with GAPS yogurt",tab:"snacks",t:"2 min",d:"Small nutrient-dense snack once yogurt is established.",i:["2 tbsp homemade 24hr GAPS yogurt","Small handful fresh blueberries"],s:["Place yogurt in bowl. Top with blueberries. Serve immediately."],nt:"Introduce only after yogurt has been well tolerated.",sh:["Fresh blueberries"]},
  {n:"Cucumber slices with ghee",tab:"snacks",t:"2 min",d:"Crisp, fresh and simple.",i:["1/2 cucumber peeled and sliced","1 tsp melted ghee","Tiny pinch sea salt"],s:["Slice cucumber. Drizzle with ghee. Sprinkle salt."],nt:"",sh:["Cucumber","Ghee"]},
  {n:"Almond butter with apple",tab:"snacks",t:"5 min",d:"Quick and filling.",i:["1-2 tbsp natural almond butter (100% almonds)","1/2 apple peeled"],s:["Stew apple for young children or slice thinly.","Serve with almond butter for dipping."],nt:"Must be 100% almonds only.",sh:["Natural almond butter (100% almonds)","Apples"]},
@@ -461,6 +467,7 @@ var MEALS = [
  {n:"Carrot sticks with almond dip",tab:"snacks",t:"10 min",d:"A GAPS-friendly snack.",i:["2 carrots cut into sticks","3 tbsp natural almond butter","1 tsp ghee","Pinch sea salt","Water to thin"],s:["Steam carrot sticks until just tender. Cool.","Mix almond butter with ghee, salt and a splash of water.","Serve carrots alongside dip."],nt:"",sh:["Carrots","Natural almond butter","Ghee"]},
  {n:"Coconut flour biscuits",tab:"snacks",t:"20 min",d:"Small lightly sweet biscuits perfect for snack time.",i:["3 tbsp coconut flour","2 fresh eggs","1 tbsp melted ghee","1 tsp raw honey","Pinch sea salt","Pinch cinnamon"],s:["Preheat oven to 350F/175C.","Whisk eggs, ghee and honey. Stir in coconut flour, salt and cinnamon. Rest 2 min.","Drop small spoonfuls onto lined baking sheet. Flatten gently.","Bake 10-12 min until golden at edges. Cool completely."],nt:"Makes 10-12 small biscuits. Store in fridge, eat within 2 days.",sh:["Coconut flour","Fresh eggs","Ghee","Raw honey","Cinnamon"]},
  {n:"Zucchini dip",tab:"snacks",t:"15 min",d:"A creamy dip without avocado.",i:["1 medium zucchini steamed and mashed","1 tsp olive oil","Pinch sea salt","1 garlic clove minced and cooked"],s:["Steam zucchini until very soft. Mash well.","Add olive oil, cooked garlic and salt.","Serve warm or at room temperature with vegetable sticks."],nt:"No avocado (high histamine). Simple and clean.",sh:["Zucchini","Olive oil","Garlic"]},
+ {n:"Warm goat milk with cinnamon",tab:"beverages",t:"5 min",d:"A cozy bedtime drink from fresh goat or raw milk.",i:["1 cup fresh goat milk or raw milk","Pinch cinnamon","Optional: 1/2 tsp raw honey"],s:["Warm milk gently. Do not boil.","Stir in cinnamon. Cool to a safe temperature.","Add honey once warm, not hot."],nt:"Only fresh raw or goat milk, never store-bought.",sh:["Fresh goat milk","Cinnamon","Raw honey"]},
  {n:"Chamomile honey tea",tab:"beverages",t:"5 min",d:"Calming and gut-supportive. A perfect bedtime drink.",i:["1 chamomile tea bag","1 cup filtered water","1/2 tsp raw honey (age 2+ optional)"],s:["Boil water. Cool 1-2 min.","Steep chamomile 3-5 min. Remove bag.","Cool to warm child-safe temperature.","Stir in honey once warm not hot."],nt:"Never add honey to boiling water.",sh:["Chamomile tea bags","Raw honey"]},
  {n:"Warm bone broth drink",tab:"beverages",t:"10 min",d:"Nourishing and healing. A key GAPS therapeutic drink.",i:["1 cup short-cook homemade bone broth (under 3 hr simmer)","Pinch sea salt","Optional: thin slice fresh ginger"],s:["Gently reheat broth. Do not boil.","Season with sea salt. Add ginger slice if desired.","Serve warm in a mug or sippy cup."],nt:"Short-cook is lower histamine. Long-simmered broth may cause reactions.",sh:["Fresh chicken or beef bones","Sea salt","Fresh ginger"]},
  {n:"Pear and ginger infused water",tab:"beverages",t:"20 min",d:"Gently flavored water. A nice change from plain.",i:["1 ripe pear peeled and sliced","2 cups filtered water","3 thin slices fresh ginger","Optional: sprig fresh mint"],s:["Simmer water, pear and ginger gently 5 min.","Cool completely. Strain into cup. Use within 24 hours."],nt:"Very lightly flavored water, not a sweet juice.",sh:["Ripe pears","Fresh ginger root","Fresh mint"]},
@@ -474,6 +481,7 @@ var MEALS = [
 
 // ── RESOURCES DATA ──────────────────────────────────────
 var RES = [
+ {icon:"&#11088;",title:"Riley's Rules",sub:"Our priority order, and what's a hard no",body:"<h3>When rules conflict, this order wins</h3><ul><li><strong>1. Gluten-free</strong> &mdash; a must, no exceptions.</li><li><strong>2. Low histamine</strong> &mdash; very close behind. Almost everything high-histamine is a hard no.</li><li><strong>3. Low sugar</strong> &mdash; close behind. High sugar is a hard no.</li><li><strong>4. GAPS</strong> &mdash; the guide we lean on, but if a food passes the first three and only GAPS objects, it's a Caution, not an Avoid.</li></ul><h3>Hard no's</h3><ul><li>Any gluten</li><li>High sugar</li><li>Strawberries, bananas, citrus, tomatoes, avocado, eggplant, spinach</li><li><strong>Leftovers</strong>: cook fresh, freeze extra right away</li><li>Fermented, aged, cured, smoked or canned foods</li><li>Processed store-bought milk (including 2%)</li><li>Any high-histamine food she hasn't been introduced to yet</li></ul><h3>Okay for Riley</h3><ul><li><strong>Eggs cooked into food</strong> (pancakes, muffins, a binder in patties). Not egg dishes like omelets or quiche.</li><li><strong>Raw milk and goat milk.</strong></li></ul><h3>The rest of the family</h3><p>Canning, dehydrating, curing and fermenting from the Field Guide are fine for everyone else. For Riley, the go-to is fresh, or frozen right away.</p><p class='cite'>Update this list as new foods get introduced.</p>"},
  {icon:"&#127807;",title:"Gluten-Free Diet",sub:"What it is and why it matters",body:"<h3>What is gluten?</h3><p>Gluten is a protein found in wheat, barley, rye and most oats. In people with celiac disease or gluten sensitivity it triggers an immune response that damages the small intestine lining, impairing nutrient absorption and causing widespread inflammation.</p><h3>What to avoid</h3><ul><li><strong>Wheat products</strong> - bread, pasta, flour, crackers, biscuits, pizza dough</li><li><strong>Barley and rye</strong> - often in soups, cereals, malt products</li><li><strong>Hidden gluten</strong> - soy sauce, bouillon cubes, malt vinegar, many spice blends</li><li><strong>Cross-contamination</strong> - shared cooking surfaces, fryer oil, restaurant kitchens</li></ul><h3>In this combined protocol</h3><p>Because GAPS already excludes all grains, the combined protocol is automatically gluten-free. The GF label helps catch hidden gluten in processed products and seasonings. Use the Scanner tab to check any unfamiliar product.</p><h3>Research</h3><p>A 2022 systematic review in <em>Nutrients</em> confirmed that a strict gluten-free diet leads to significant improvements in intestinal permeability, symptom burden and quality of life in children with celiac disease and gluten sensitivity.</p><p class='cite'>Vici et al., Nutrients (2022); Catassi et al., Nutrients (2017)</p>"},
  {icon:"&#127852;",title:"Low Sugar Diet",sub:"Reducing sugar to support gut, immune and brain health",body:"<h3>Why eliminate sugar?</h3><p>Refined sugar feeds pathogenic bacteria and yeast in the gut, creates blood sugar spikes that affect mood and behavior, undermines immune function and drives systemic inflammation. For children with dysbiosis, sugar removal is foundational.</p><h3>All forms to avoid</h3><ul><li><strong>Obvious sugars</strong> - white sugar, brown sugar, cane sugar, coconut sugar</li><li><strong>Liquid sweeteners</strong> - maple syrup, agave, corn syrup, date syrup</li><li><strong>Fruit juice</strong> - even 100% natural juice concentrates sugars rapidly</li><li><strong>Hidden sugars</strong> - most store-bought sauces, dressings, snacks, cereals, flavored yogurts</li><li><strong>Artificial sweeteners</strong> - not recommended for children, can alter gut microbiome</li></ul><h3>What is allowed</h3><p>Raw honey in very small amounts is the one sweetener permitted on GAPS. Think 1/4 to 1/2 teaspoon maximum, not a daily staple. Natural sugars in low-glycemic whole fruits like pears, apples and blueberries are allowed in moderation after GAPS intro.</p><h3>Benefits</h3><ul><li>Reduces Candida and pathogenic yeast overgrowth</li><li>Stabilizes energy and mood, fewer tantrums and crashes</li><li>Reduces systemic inflammation</li><li>Supports a healthier, more diverse gut microbiome</li><li>May reduce skin conditions, irritability and sleep disruption</li></ul><p class='cite'>Satokari (2020) Nutrients; Spreadbury (2012) Acta Physiologica</p>"},
  {icon:"&#128300;",title:"Low Histamine Diet",sub:"Understanding histamine intolerance in children",body:"<h3>What is histamine?</h3><p>Histamine is a naturally occurring chemical involved in immune responses, digestion and neurotransmitter signaling. Normally an enzyme called DAO (diamine oxidase) breaks it down in the gut. When DAO activity is low due to gut inflammation or dysbiosis, histamine accumulates and causes symptoms.</p><h3>Common symptoms in children</h3><ul><li><strong>Skin</strong> - hives, rashes, flushing, eczema flares</li><li><strong>Digestive</strong> - diarrhea, stomach pain, bloating, reflux</li><li><strong>Behavioral</strong> - irritability, hyperactivity, poor sleep, moodiness</li><li><strong>Respiratory</strong> - runny nose, congestion without infection</li></ul><h3>High histamine foods to avoid</h3><ul><li>Fermented and aged foods - sauerkraut, kimchi, vinegar, pickles, aged cheeses</li><li>Processed and cured meats - deli meats, sausages, smoked fish</li><li>Canned fish - tuna, sardines, anchovies</li><li>Tomatoes, eggplant, avocado, spinach in large amounts</li></ul><h3>Histamine liberators</h3><p>These trigger the body to release its own histamine: strawberries, citrus fruits, chocolate, artificial food dyes, preservatives and MSG.</p><h3>The freshness rule</h3><p>Histamine forms as food ages. A freshly cooked chicken breast is low histamine. The same chicken refrigerated overnight can be significantly higher. Cook fresh, eat fresh, freeze immediately what you cannot eat.</p><h3>The good news</h3><p>DAO enzyme production often improves significantly as the gut heals on GAPS. Many families find that after 6-18 months their child can gradually tolerate foods that previously caused reactions.</p><p class='cite'>Maintz and Novak (2007) AJCN; Comas-Baste et al. (2020) Biomolecules</p>"},
@@ -483,7 +491,7 @@ var RES = [
 ];
 
 // ── STORAGE ──────────────────────────────────────────────
-function save(){try{localStorage.setItem('rdg_fav',JSON.stringify(favorites));localStorage.setItem('rdg_lst',JSON.stringify(shopList));localStorage.setItem('rdg_rx',JSON.stringify(reactions));localStorage.setItem('rdg_gen',JSON.stringify(generatedRecipes));}catch(e){}}
+function save(){try{localStorage.setItem('rdg_fav',JSON.stringify(favorites));localStorage.setItem('rdg_lst',JSON.stringify(shopList));localStorage.setItem('rdg_rx',JSON.stringify(reactions));localStorage.setItem('rdg_gen',JSON.stringify(generatedRecipes));}catch(e){} if(typeof cloudPush==='function')cloudPush();}
 function load(){try{var f=localStorage.getItem('rdg_fav'),l=localStorage.getItem('rdg_lst'),r=localStorage.getItem('rdg_rx'),g=localStorage.getItem('rdg_gen');if(f)favorites=JSON.parse(f);if(l)shopList=JSON.parse(l);if(r)reactions=JSON.parse(r);if(g)generatedRecipes=JSON.parse(g);}catch(e){}}
 
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
@@ -550,7 +558,7 @@ function renderFoods(){
    var ic=f.s==='allowed'?'&#10003;':f.s==='avoid'?'&#10007;':'~';
    var isFav=favorites.foods.indexOf(f.n)>-1;
    var tags='';
-   ['gf','ls','lh','g'].forEach(function(k){
+   ['gf','lh','ls','g'].forEach(function(k){
     var v=f.d[k];
     var tc=v==='ok'?'dtok':v==='no'?'dtno':'dtca';
     var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';
@@ -613,7 +621,7 @@ function renderMeals(){
    '<div class="ms"><h4>Ingredients</h4><ul>'+ingr+'</ul></div>'+
    '<div class="ms"><h4>Steps</h4><ol>'+steps+'</ol></div>'+
    (m.nt?'<div class="nbox"><h4>Important note</h4><p>'+m.nt+'</p></div>':'')+
-   '<div class="dtags" style="margin-top:10px"><span class="dt dtok">GF &#10003;</span><span class="dt dtok">LS &#10003;</span><span class="dt dtok">LH &#10003;</span><span class="dt dtok">GAPS &#10003;</span></div>'+
+   '<div class="dtags" style="margin-top:10px"><span class="dt dtok">GF &#10003;</span><span class="dt dtok">LH &#10003;</span><span class="dt dtok">LS &#10003;</span><span class="dt dtok">GAPS &#10003;</span></div>'+
    shopBtns+'</div></div>';
  });
  grid.innerHTML=html;
@@ -652,7 +660,7 @@ function renderFavs(){
   fF.forEach(function(f){
    var bc=f.s==='allowed'?'bok':f.s==='avoid'?'bno':'bca';
    var tags='';
-   ['gf','ls','lh','g'].forEach(function(k){var v=f.d[k];var tc=v==='ok'?'dtok':v==='no'?'dtno':'dtca';var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';tags+='<span class="dt '+tc+'">'+k.toUpperCase()+':'+vi+'</span>';});
+   ['gf','lh','ls','g'].forEach(function(k){var v=f.d[k];var tc=v==='ok'?'dtok':v==='no'?'dtno':'dtca';var vi=v==='ok'?'&#10003;':v==='no'?'&#10007;':'~';tags+='<span class="dt '+tc+'">'+k.toUpperCase()+':'+vi+'</span>';});
    html+='<div class="fc"><div class="fch"><div class="fci"><div class="fcn">'+f.n+'</div><div class="fcc">'+f.c+'</div></div>'+
     '<div class="fca"><button onclick="remFavFood(\''+f.n.replace(/'/g,"\\'")+'\')" style="font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);cursor:pointer">Remove</button>'+
     '<span class="bdg '+bc+'">'+(f.s==='allowed'?'&#10003;':f.s==='avoid'?'&#10007;':'~')+'</span></div></div>'+
@@ -885,13 +893,14 @@ function familyRules(){
  var avoid=[],caution=[],ok=[];
  FOODS.forEach(function(f){if(f.s==='avoid')avoid.push(f.n);else if(f.s==='caution')caution.push(f.n);else ok.push(f.n);});
  return ' FAMILY FOOD LIST (this overrides any general rule above when they disagree): NEVER use or suggest these, not even in small amounts or as a minor ingredient: '+avoid.join('; ')+'.'+
-  ' EGGS ARE NOT ALLOWED IN ANY FORM: no whole eggs, egg whites, or egg yolks, including as a binder or in baked goods, and no egg-based products like mayonnaise.'+
+  ' EGGS: fine cooked into food (baked goods, binders); never as the main dish (no omelets, quiche, frittatas, scrambled, fried, boiled or soft eggs, no raw yolks, no mayonnaise).'+
   (caution.length?' Use these only in tiny amounts and never as the main ingredient: '+caution.join('; ')+'.':'')+
   ' These ARE allowed for this child even if a general rule above says otherwise: '+ok.join('; ')+'.';
 }
 // ── RECIPE BUILDER ───────────────────────────────────────
 var curMealTypeChoice = '';
-var BUILDER_PROMPT = 'You are a recipe creator for a family whose 4-year-old daughter follows a strict combined diet. ALL recipes must comply with ALL FOUR of these rules simultaneously: (1) GLUTEN-FREE: absolutely no wheat, barley, rye, or oats in any form; (2) EXTREMELY LOW SUGAR: no added sugars, no syrups, no juice, only tiny raw honey allowed and only for children over 2; (3) LOW HISTAMINE: no aged, fermented, canned, or smoked foods, no tomatoes, no citrus, no strawberries, no avocado, no eggplant, no vinegar, no soy sauce, no long-cooked broth - use only short-cook broth under 3 hours; (4) GAPS DIET: no grains at all including rice and corn, no starchy vegetables like potatoes, no legumes including beans and lentils, no processed foods - allowed foods are fresh meats, eggs, non-starchy vegetables, nuts, coconut products, ghee, and tiny raw honey. CRITICAL FRESHNESS RULE: always instruct the user to cook meat fresh and eat immediately, as histamine rises rapidly in stored cooked meat. The child is 4 years old so recipes should use soft textures and mild flavors that appeal to children and adults alike. Respond ONLY in this exact JSON with no markdown and no preamble: {"recipeName":"string","mealType":"string","cookTime":"string","servings":"string","description":"string","ingredients":["array of ingredient strings with amounts"],"steps":["array of step strings"],"complianceNote":"one sentence explaining why this recipe is safe","kidFriendlyTip":"one tip for making this appealing to a 4 year old","shoppingList":["array of just the ingredient names without amounts for shopping"]}';
+var RILEY_RULES = 'You are helping a family whose 4-year-old daughter, Riley, follows a combined diet. When rules conflict, follow this PRIORITY ORDER: (1) GLUTEN-FREE is absolute: no wheat, barley, rye, malt, regular oats, or anything that may contain them, including soy sauce and most store-bought seasonings. (2) LOW HISTAMINE is nearly absolute: no aged, fermented, cured, smoked or canned foods, no vinegar, soy sauce, long-cooked broth (short-cook broth under 3 hours is OK), tomatoes, citrus, strawberries, bananas, avocado, eggplant, spinach, chocolate, and NO LEFTOVERS: cook fresh and eat right away, freeze extras immediately. Any high-histamine food she has not been introduced to yet counts as a no. (3) LOW SUGAR: no added sugar, syrups, juice or dried fruit; only tiny amounts of raw honey; low-sugar whole fruits like pears, apples and blueberries in small amounts. (4) GAPS is the lowest priority: prefer GAPS-friendly foods (no grains, no starchy vegetables, no legumes, no processed foods), but a food that clearly passes rules 1-3 is a caution, not an avoid, when GAPS is the only problem. FAMILY SPECIFICS: eggs cooked INTO food are fine (baked goods, a binder in meatballs or patties), but NO egg-centered dishes: no omelets, quiche, frittatas, scrambled, fried, boiled or soft eggs, and no raw yolks. Fresh raw cow milk and goat milk are fine; processed store-bought milk (including 2%) is not. ';
+var BUILDER_PROMPT = RILEY_RULES + 'You create recipes that follow these rules. CRITICAL FRESHNESS RULE: always instruct the user to cook meat fresh and eat immediately, as histamine rises rapidly in stored cooked meat. The child is 4 years old so recipes should use soft textures and mild flavors that appeal to children and adults alike. Respond ONLY in this exact JSON with no markdown and no preamble: {"recipeName":"string","mealType":"string","cookTime":"string","servings":"string","description":"string","ingredients":["array of ingredient strings with amounts"],"steps":["array of step strings"],"complianceNote":"one sentence explaining why this recipe is safe","kidFriendlyTip":"one tip for making this appealing to a 4 year old","shoppingList":["array of just the ingredient names without amounts for shopping"]}';
 
 function setMealType(type, btn) {
  curMealTypeChoice = type;
@@ -990,7 +999,7 @@ document.getElementById('photoInput').addEventListener('change',function(e){
 });
 document.getElementById('pinput').addEventListener('keydown',function(e){if(e.key==='Enter')doScan();});
 
-var SYSPROMPT='You are a dietary expert helping parents of a 4-year-old girl on a strict combined diet: 1. GLUTEN-FREE: no wheat, barley, rye, regular oats 2. EXTREMELY LOW SUGAR: no added sugars, minimal natural sugars, no syrups, no juice 3. LOW HISTAMINE: avoid aged/fermented/canned foods, tomatoes, citrus, strawberries, avocado, vinegar, alcohol, long-cooked broth 4. GAPS DIET: no grains (including rice, corn, oats), no starchy vegetables (potatoes), no legumes, no processed foods. Allowed: fresh meats, eggs, non-starchy vegetables, nuts/seeds, raw honey in tiny amounts. Respond ONLY in this exact JSON (no markdown): {"verdict":"allowed|caution|avoid","productName":"string","summary":"one sentence","dietBreakdown":{"glutenFree":{"status":"ok|caution|no","reason":"brief"},"lowSugar":{"status":"ok|caution|no","reason":"brief"},"lowHistamine":{"status":"ok|caution|no","reason":"brief"},"gaps":{"status":"ok|caution|no","reason":"brief"}},"keyIssues":["array"],"saferAlternative":"string or null"}';
+var SYSPROMPT=RILEY_RULES+'You are checking a product for her. A gluten problem or a clear high-histamine ingredient means avoid. A problem with GAPS alone means caution. Respond ONLY in this exact JSON (no markdown): {"verdict":"allowed|caution|avoid","productName":"string","summary":"one sentence","dietBreakdown":{"glutenFree":{"status":"ok|caution|no","reason":"brief"},"lowSugar":{"status":"ok|caution|no","reason":"brief"},"lowHistamine":{"status":"ok|caution|no","reason":"brief"},"gaps":{"status":"ok|caution|no","reason":"brief"}},"keyIssues":["array"],"saferAlternative":"string or null"}';
 
 window.doScan = async function(){
  var btn=document.getElementById('scanbtn');
@@ -1044,7 +1053,7 @@ function paintSimple(){
 var SIMPLE_RULES=' LUNCHBOX SIMPLE MODE IS ON: every idea must be something a busy parent can put together in 5 minutes or less on a school morning and pack into a lunch or breakfast box. No cooking that morning. Prep-ahead is only OK if it is a quick weekend batch item that keeps safely under the histamine rules. Mostly 1-4 ingredients, store-bought where possible, finger-food or spoonable, holds up a few hours in a lunch box with an ice pack, and needs no reheating. Do NOT pack leftover cooked meat because histamine rises in stored cooked meat. Keep the steps to 1-3 very short lines.';
 var SHOP_RULES=' SHOP & PACK MODE: instead of recipes, suggest single store-bought foods or very simple pairings (like how cottage cheese, blueberries, or mango worked for her) that fit all four diet rules, are easy to find at a regular grocery store, and pack straight into a lunch box. For each, "how" should be 1-2 short packing or serving tips, "time" should be "Grab & go", and "ingredients" should be just the item(s) to buy. Mention any label to check (for example no added sugar, no gums or fillers) in the "what" line.';
 try{var _t=localStorage.getItem('rdg_tired');if(_t)tiredOf=JSON.parse(_t);var _h=localStorage.getItem('rdg_hits');if(_h)ideaHits=JSON.parse(_h);}catch(e){}
-function saveIdeas(){try{localStorage.setItem('rdg_tired',JSON.stringify(tiredOf));localStorage.setItem('rdg_hits',JSON.stringify(ideaHits));}catch(e){}}
+function saveIdeas(){try{localStorage.setItem('rdg_tired',JSON.stringify(tiredOf));localStorage.setItem('rdg_hits',JSON.stringify(ideaHits));}catch(e){} if(typeof cloudPush==='function')cloudPush();}
 function escH(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
 function setIdeaType(type,btn){
@@ -1140,6 +1149,98 @@ function ideaToBuilder(id,isHit){
  window.scrollTo(0,0);toast('Ready — tap Build My Recipe');
 }
 
+// ── CLOUD SYNC (Nov 2026) ───────────────────────────────
+// Shopping list, reactions log, saved items, Fresh Ideas hits and the
+// tired-of list are shared between both phones through Supabase (the same
+// database as the ranch app). Each phone still keeps its own copy so the
+// app works with no signal; changes upload when it's back.
+var SB_URL='https://hrtuhexblsbdjfdbfblg.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhydHVoZXhibHNiZGpmZGJmYmxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMzg2MjAsImV4cCI6MjA5OTcxNDYyMH0.UuG4vU-qqcEs7LffzhgDqb2tVBq9RaeR1gwhvOpJXvs';
+var sb=null;
+try{ sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'rdg-noauth'}}); }catch(e){ sb=null; }
+var cloudSynced={diet_list:{},diet_rx:{},diet_kv:{}};
+var cloudBusy=false,cloudAgain=false,cloudRetry=null,cloudWarned=false,cloudReady=false,pullAfterPush=false;
+function cloudRows(){
+ return {
+  diet_list:shopList.map(function(i){return {id:String(i.id),n:i.n,cat:i.cat,done:i.done?'1':''};}),
+  diet_rx:reactions.map(function(r){return {id:String(r.id),name:r.name,reason:r.reason,date:r.date,cat:r.cat,sev:r.sev,notes:r.notes||''};}),
+  diet_kv:[{key:'fav',value:JSON.stringify(favorites)},{key:'gen',value:JSON.stringify(generatedRecipes)},{key:'tired',value:JSON.stringify(tiredOf)},{key:'hits',value:JSON.stringify(ideaHits)}]
+ };
+}
+function rowId(t,r){return t==='diet_kv'?r.key:r.id;}
+function cacheLocal(){try{localStorage.setItem('rdg_fav',JSON.stringify(favorites));localStorage.setItem('rdg_lst',JSON.stringify(shopList));localStorage.setItem('rdg_rx',JSON.stringify(reactions));localStorage.setItem('rdg_gen',JSON.stringify(generatedRecipes));localStorage.setItem('rdg_tired',JSON.stringify(tiredOf));localStorage.setItem('rdg_hits',JSON.stringify(ideaHits));}catch(e){}}
+function applyCloud(data){
+ shopList=data.diet_list.map(function(r){return {id:parseFloat(r.id),n:r.n,cat:r.cat||'Other',done:r.done==='1'};}).sort(function(a,b){return a.id-b.id;});
+ reactions=data.diet_rx.map(function(r){return {id:parseFloat(r.id),name:r.name,reason:r.reason,date:r.date,cat:r.cat,sev:r.sev,notes:r.notes||''};}).sort(function(a,b){return b.id-a.id;});
+ data.diet_kv.forEach(function(r){try{var v=JSON.parse(r.value);if(r.key==='fav')favorites=v;if(r.key==='gen')generatedRecipes=v;if(r.key==='tired')tiredOf=v;if(r.key==='hits')ideaHits=v;}catch(e){}});
+}
+function markCloudSynced(){var rows=cloudRows();Object.keys(rows).forEach(function(t){cloudSynced[t]={};rows[t].forEach(function(r){cloudSynced[t][rowId(t,r)]=JSON.stringify(r);});});}
+function refreshViews(){
+ updateListBadge();updateRxBadge();
+ var on=document.querySelector('.pg.on');if(!on)return;var pg=on.id.slice(3);
+ if(pg==='foods')renderFoods();if(pg==='meals')renderMeals();if(pg==='list')renderList();if(pg==='rx')renderRx();if(pg==='favs')renderFavs();if(pg==='ideas'){renderTired();renderHits();}
+}
+async function cloudPull(){
+ if(!sb)return;
+ if(cloudBusy||cloudDirty()){pullAfterPush=true;return;}
+ try{
+  var out={};
+  for(var t of ['diet_list','diet_rx','diet_kv']){var r=await sb.from(t).select('*');if(r.error)throw r.error;out[t]=r.data;}
+  var cloudEmpty=!out.diet_list.length&&!out.diet_rx.length&&!out.diet_kv.length;
+  var localHas=shopList.length||reactions.length||favorites.foods.length||favorites.meals.length||generatedRecipes.length||ideaHits.length;
+  var firstTime=false;try{firstTime=localStorage.getItem('rdg_cloud1')!=='1';}catch(e){}
+  if(firstTime){
+   // First sync on this phone: keep everything this phone already had and add
+   // what's in the cloud, so nobody's list or reactions log gets wiped.
+   var mine={list:shopList.slice(),rx:reactions.slice(),fav:JSON.parse(JSON.stringify(favorites)),gen:generatedRecipes.slice(),tired:tiredOf.slice(),hits:ideaHits.slice()};
+   applyCloud(out);
+   markCloudSynced();
+   var byId=function(arr){var m={};arr.forEach(function(x){m[String(x.id)]=1;});return m;};
+   var have=byId(shopList);mine.list.forEach(function(x){if(!have[String(x.id)])shopList.push(x);});
+   have=byId(reactions);mine.rx.forEach(function(x){if(!have[String(x.id)])reactions.push(x);});
+   reactions.sort(function(a,b){return b.id-a.id;});
+   ['foods','meals'].forEach(function(k){favorites[k]=favorites[k]||[];(mine.fav[k]||[]).forEach(function(n){if(favorites[k].indexOf(n)<0)favorites[k].push(n);});});
+   have=byId(generatedRecipes);mine.gen.forEach(function(x){if(!have[String(x.id)])generatedRecipes.push(x);});
+   have=byId(ideaHits);mine.hits.forEach(function(x){if(!have[String(x.id)])ideaHits.push(x);});
+   mine.tired.forEach(function(t){if(tiredOf.indexOf(t)<0)tiredOf.push(t);});
+   try{localStorage.setItem('rdg_cloud1','1');}catch(e){}
+   cloudReady=true;cacheLocal();refreshViews();cloudPush();
+   if(cloudEmpty&&localHas)toast('Shared your lists with the cloud');
+   return;
+  }
+  applyCloud(out);markCloudSynced();cloudReady=true;cacheLocal();refreshViews();
+ }catch(e){console.warn('Diet Guide: could not reach the cloud, using this phone\'s copy',e);}
+}
+function cloudDirty(){if(!cloudReady)return false;var rows=cloudRows();return Object.keys(rows).some(function(t){var ids={};var ch=rows[t].some(function(r){var id=rowId(t,r);ids[id]=1;return cloudSynced[t][id]!==JSON.stringify(r);});return ch||Object.keys(cloudSynced[t]).some(function(id){return !ids[id];});});}
+async function cloudPush(){
+ if(!sb||!cloudReady)return;
+ if(cloudBusy){cloudAgain=true;return;}
+ cloudBusy=true;var failed=false;
+ try{
+  var rows=cloudRows();
+  for(var t of Object.keys(rows)){
+   var map=cloudSynced[t],ids={};
+   var changed=rows[t].filter(function(r){var id=rowId(t,r);ids[id]=1;return map[id]!==JSON.stringify(r);});
+   for(var i=0;i<changed.length;i+=20){var batch=changed.slice(i,i+20);var u=await sb.from(t).upsert(batch);if(u.error){failed=true;console.error(u.error);}else batch.forEach(function(r){map[rowId(t,r)]=JSON.stringify(r);});}
+   var gone=Object.keys(map).filter(function(id){return !ids[id];});
+   if(gone.length){var d=await sb.from(t).delete().in(t==='diet_kv'?'key':'id',gone);if(d.error){failed=true;console.error(d.error);}else gone.forEach(function(id){delete map[id];});}
+  }
+ }catch(e){failed=true;console.error(e);}
+ cloudBusy=false;clearTimeout(cloudRetry);
+ if(failed){if(!cloudWarned){toast("Couldn't sync yet, will keep trying");cloudWarned=true;}cloudRetry=setTimeout(cloudPush,15000);}
+ else if(cloudWarned){toast('Synced ✓');cloudWarned=false;}
+ if(cloudAgain){cloudAgain=false;cloudPush();}
+ else if(pullAfterPush&&!failed){pullAfterPush=false;cloudPull();}
+}
+var rtTimer=null;
+function cloudListen(){
+ if(!sb)return;
+ var ch=sb.channel('rdg-sync');
+ ['diet_list','diet_rx','diet_kv'].forEach(function(t){ch.on('postgres_changes',{event:'*',schema:'public',table:t},function(){clearTimeout(rtTimer);rtTimer=setTimeout(cloudPull,500);});});
+ ch.subscribe();
+}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')cloudPull();});
+
 load();
 buildCatPills();
 buildListCats();
@@ -1150,6 +1251,8 @@ updateRxBadge();
 document.getElementById('rx-date').value=new Date().toISOString().split('T')[0];
 document.querySelector('.svb.mild').classList.add('on');
 document.getElementById('fsrch').addEventListener('input',renderFoods);
+cloudPull();cloudListen();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 
 } catch(err) {
   document.body.innerHTML = '<div style="padding:20px;font-family:sans-serif"><h2 style="color:red">Error found:</h2><p style="margin-top:10px;font-size:14px;background:#fee;padding:12px;border-radius:8px">' + err.message + '<br><br>Line: ' + (err.lineNumber || err.line || 'unknown') + '</p></div>';
