@@ -14,7 +14,7 @@
 :root{--g:#1D9E75;--gl:#E1F5EE;--gd:#085041;--a:#BA7517;--al:#FAEEDA;--ad:#633806;--r:#E24B4A;--rl:#FCEBEB;--rd:#791F1F;--b:#185FA5;--bl:#E6F1FB;--bd:#042C53;--bdr:#e0ddd6;--bg:#fff;--bg2:#f8f7f4;--tx:#1a1a18;--t2:#5a5956;--t3:#8a8885}
 @media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--bg2:#242422;--tx:#f0ede8;--t2:#a8a5a0;--t3:#6a6865;--bdr:#3a3835;--gl:#0a2e22;--al:#2a1e08;--rl:#2a1010;--bl:#0a1e30;--gd:#5DCAA5;--ad:#EF9F27;--rd:#F09595;--bd:#85B7EB}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--tx);padding-bottom:24px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--tx);padding-bottom:96px}
 .nav{background:var(--bg);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:200}
 .nav-i{max-width:720px;margin:0 auto;display:flex;align-items:stretch}
 .brand{padding:10px 14px;flex-shrink:0}
@@ -103,7 +103,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .lab.dng{border-color:var(--r);color:var(--rd)}
 .cbdg{background:var(--g);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;margin-left:2px}
 .infobox{background:var(--gl);border:1px solid var(--g);border-radius:12px;padding:11px 13px;margin-bottom:13px;font-size:13px;color:var(--gd);line-height:1.5}
-.scan-area{border:2px dashed var(--bdr);border-radius:12px;padding:26px 20px;text-align:center;margin-bottom:13px;background:var(--bg2);cursor:pointer}
+.scanpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.scan-area{border:2px dashed var(--g);border-radius:16px;padding:22px 10px;text-align:center;background:var(--gl);cursor:pointer;color:var(--gd);font-family:inherit}
+.scan-area .ic{font-size:44px;line-height:1;margin-bottom:8px}
+.scan-area .lb{font-size:17px;font-weight:700}
+.scan-area .sb{font-size:12px;color:var(--t2);margin-top:3px}
+body.onscan .scanfab{display:none}
 #photoInput{display:none}
 .prev-img{width:100%;max-height:200px;object-fit:contain;border-radius:8px;margin-bottom:11px;border:1px solid var(--bdr)}
 .or-div{display:flex;align-items:center;gap:10px;margin:12px 0;color:var(--t3);font-size:13px}
@@ -177,6 +182,11 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
 .gen-save:active{background:var(--g);color:#fff}
 .gen-save.saved{background:var(--g);color:#fff}
 .gen-addlist{margin-top:8px;margin-left:8px;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tab.scan{color:#fff;background:var(--g);border-radius:20px;min-height:34px;align-self:center;margin:0 4px;padding:0 14px;font-weight:700;border-bottom:none}
+.tab.scan.on{background:var(--gd);color:#fff}
+.scanfab{position:fixed;right:18px;bottom:22px;z-index:300;display:flex;align-items:center;gap:8px;padding:14px 20px 14px 16px;border:none;border-radius:32px;background:var(--g);color:#fff;font-size:16px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.28);cursor:pointer}
+.scanfab:active{transform:scale(.96)}
+.scanfab span{font-size:22px;line-height:1}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a18;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;transition:transform .3s;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0)}
 </style>
@@ -190,8 +200,8 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
   </div>
   <div class="tabs" id="mainTabs">
    <button class="tab on" onclick="goTab('foods',this)">Foods</button>
+   <button class="tab scan" id="scanTab" onclick="goTab('scanner',this)">&#128247; Scanner</button>
    <button class="tab" onclick="goTab('meals',this)">Meals</button>
-   <button class="tab" onclick="goTab('scanner',this)">Scanner</button>
    <button class="tab" onclick="goTab('list',this)">List <span class="cbdg" id="lc" style="display:none">0</span></button>
    <button class="tab" onclick="goTab('favs',this)">Saved &#9829;</button>
    <button class="tab" onclick="goTab('rx',this)">Reactions <span class="cbdg" id="rxc" style="display:none">0</span></button>
@@ -234,19 +244,23 @@ textarea.finp{resize:vertical;min-height:65px;line-height:1.5}
  <div id="mealGrid"></div>
 </div>
 
+<button class="scanfab" id="scanFab" onclick="quickScan()" aria-label="Scan a label"><span>&#128247;</span>Scan</button>
+
 <div class="pg" id="pg-scanner">
  <div class="infobox"><strong>AI ingredient checker.</strong> Photo a product label or type a name to check it against all four diet rules.</div>
- <div class="scan-area" onclick="document.getElementById('photoInput').click()">
-  <div style="font-size:36px;margin-bottom:8px">&#128247;</div>
-  <div style="font-size:15px;font-weight:600;margin-bottom:3px">Take or upload a photo</div>
-  <div style="font-size:13px;color:var(--t3)">Point at a product label or ingredient list</div>
+ <div class="scanpick">
+  <button class="scan-area" onclick="document.getElementById('photoInput').click()">
+   <div class="ic">&#128247;</div><div class="lb">Photo a label</div><div class="sb">Ingredient list</div>
+  </button>
+  <button class="scan-area" onclick="var i=document.getElementById('pinput');i.focus();i.select();">
+   <div class="ic">&#9000;&#65039;</div><div class="lb">Type a name</div><div class="sb">Product or food</div>
+  </button>
  </div>
  <input type="file" id="photoInput" accept="image/*" capture="environment"/>
  <img id="pphoto" class="prev-img" style="display:none"/>
- <div class="or-div">or type a product name</div>
  <div class="sw" style="margin-bottom:10px">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-  <input class="si" id="pinput" type="text" placeholder="e.g. Enjoy Life chocolate chips..."/>
+  <input class="si" id="pinput" type="text" placeholder="Type a product, e.g. Enjoy Life chips..."/>
  </div>
  <button class="btn" id="scanbtn" onclick="doScan()">Check this product</button>
  <div id="scanResult"></div>
@@ -506,6 +520,7 @@ function goTab(page,btn){
  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
  document.getElementById('pg-'+page).classList.add('on');
  if(btn)btn.classList.add('on');
+ document.body.classList.toggle('onscan',page==='scanner');
  if(page==='meals')renderMeals();
  if(page==='favs')renderFavs();
  if(page==='list')renderList();
@@ -988,6 +1003,13 @@ function addGeneratedToList(genId, btn) {
 }
 
 // ── SCANNER ──────────────────────────────────────────────
+// Floating Scan button: jump to the Scanner from any tab
+function quickScan(){
+ goTab('scanner',document.getElementById('scanTab'));
+ window.scrollTo(0,0);
+}
+// Home-screen shortcut (long-press the icon) opens straight to the Scanner
+if(/[?&]scan=1/.test(location.search)){goTab('scanner',document.getElementById('scanTab'));}
 document.getElementById('photoInput').addEventListener('change',function(e){
  var file=e.target.files[0];if(!file)return;
  var reader=new FileReader();
